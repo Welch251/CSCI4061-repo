@@ -6,6 +6,7 @@
 cmd_t *cmd_new(char *argv[]){
         cmd_t *cmd = malloc(sizeof (cmd_t));
         cmd->name = strdup(argv[0]);
+        cmd->argv = strdup(argv);
         //for (int i = 0;
         //cmd->argv = strdup(argv);
         cmd->pid = NULL;
@@ -40,5 +41,13 @@ void cmd_start(cmd_t *cmd){
 }
 void cmd_fetch_output(cmd_t *cmd);
 void cmd_print_output(cmd_t *cmd);
-void cmd_update_state(cmd_t *cmd, int nohang);
-
+void cmd_update_state(cmd_t *cmd, int nohang){
+	if (cmd->finished != 1){
+		waitpid(cmd->pid,&status,nohang);
+		if (WIFEXITED(status)){
+			cmd->finished = 1;
+			cmd->status = WEXITSTATUS(status);
+			cmd_fetch_output(cmd);
+		}	
+	}
+}
