@@ -31,12 +31,13 @@ void cmd_start(cmd_t *cmd){
         cmd->str_status = snprintf("RUN");
         cmd->pid = fork();
 	if (cmd->pid == 0){
-		dup2(1,pipes[1]);
-		close(pipes[0]);
+		dup2(PWRITE,cmd->out_pipe[PWRITE]);
+		close(cmd->out_pipe[PREAD]);
+		//execvp
 	}
 	else{
-		dup2(0,pipes[0]);		
-		close(pipes[1]);
+		dup2(PREAD,cmd->out_pipe[PREAD]);		
+		close(cmd->out_pipe[1]);
 	}
 }
 void cmd_fetch_output(cmd_t *cmd);
@@ -47,7 +48,10 @@ void cmd_update_state(cmd_t *cmd, int nohang){
 		if (WIFEXITED(status)){
 			cmd->finished = 1;
 			cmd->status = WEXITSTATUS(status);
-			cmd_fetch_output(cmd);
+			cmd->str_status = sprintf("EXIT(%d)",cmd->status);
+			//cmd_fetch_output(cmd);
+			printf("@!!! %s[#%d]: %s",cmd->name,cmd->pid, cmd->str_status);
+			
 		}	
 	}
 }
