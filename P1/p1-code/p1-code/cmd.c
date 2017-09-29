@@ -9,7 +9,7 @@ cmd_t *cmd_new(char *argv[]){
         //for (int i = 0;
         //cmd->argv = strdup(argv);
         cmd->pid = NULL;
-        cmd->out_pipe = [-1,-1];
+        cmd->out_pipe = NULL;
         cmd->finished = 0;
         cmd->status = -1;
         cmd->str_status = snprintf("INIT");
@@ -24,11 +24,19 @@ void cmd_free(cmd_t *cmd){
         }
         free(cmd);
 }
-void cmd_info(cmd_t *cmd);
+//void cmd_info(cmd_t *cmd);
 void cmd_start(cmd_t *cmd){
         cmd->out_pipe = pipe(int pipes[2]);
         cmd->str_status = snprintf("RUN");
         cmd->pid = fork();
+	if (cmd->pid == 0){
+		dup2(1,pipes[1]);
+		close(pipes[0]);
+	}
+	else{
+		dup2(0,pipes[0]);		
+		close(pipes[1]);
+	}
 }
 void cmd_fetch_output(cmd_t *cmd);
 void cmd_print_output(cmd_t *cmd);
