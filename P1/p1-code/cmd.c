@@ -6,9 +6,11 @@
 cmd_t *cmd_new(char *argv[]){
         cmd_t *cmd = malloc(sizeof (cmd_t));
         cmd->name = strdup(argv[0]);
+        for(int i=0; i = ARG_MAX; i++){
+          cmd->argv[i] = strdup(argv[i]);
+        }
         cmd->argv = strdup(argv);
-        //for (int i = 0;
-        //cmd->argv = strdup(argv);
+        cmd->argv[ARG_MAX+1] = NULL;
         cmd->pid = NULL;
         cmd->out_pipe = NULL;
         cmd->finished = 0;
@@ -33,11 +35,11 @@ void cmd_start(cmd_t *cmd){
 	if (cmd->pid == 0){
 		dup2(PWRITE,cmd->out_pipe[PWRITE]);
 		close(cmd->out_pipe[PREAD]);
-		//execvp
+		//execvp()
 	}
 	else{
-		dup2(PREAD,cmd->out_pipe[PREAD]);		
-		close(cmd->out_pipe[1]);
+		dup2(PREAD,cmd->out_pipe[PREAD]);
+		close(cmd->out_pipe[PWRITE]);
 	}
 }
 void cmd_fetch_output(cmd_t *cmd);
@@ -51,7 +53,7 @@ void cmd_update_state(cmd_t *cmd, int nohang){
 			cmd->str_status = sprintf("EXIT(%d)",cmd->status);
 			//cmd_fetch_output(cmd);
 			printf("@!!! %s[#%d]: %s",cmd->name,cmd->pid, cmd->str_status);
-			
-		}	
+
+		}
 	}
 }
