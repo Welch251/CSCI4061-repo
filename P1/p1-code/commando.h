@@ -36,7 +36,7 @@ typedef struct {
 } cmd_t;
 
 // cmdctl_t: struct for tracking multiple commands
-typedef struct {                
+typedef struct {
   cmd_t *cmd[MAX_CHILD];        // array of pointers to cmd_t
   int size;                     // number of cmds in the array
 } cmdctl_t;
@@ -48,7 +48,7 @@ void pause_for(long nanos, int secs);
 // cmd.c
 cmd_t *cmd_new(char *argv[]);
 void cmd_free(cmd_t *cmd);
-void cmd_info(cmd_t *cmd);
+// void cmd_info(cmd_t *cmd); //removed
 void cmd_start(cmd_t *cmd);
 void cmd_fetch_output(cmd_t *cmd);
 void cmd_print_output(cmd_t *cmd);
