@@ -1,7 +1,7 @@
 CFLAGS = -Wall -g
 CC = gcc $(CFLAGS)
 
-commando : commando.o, cmd.o, cmdctl.o commando.h
+commando : commando.o cmd.o cmdctl.o commando.h
 	$(CC) -o commando commando.o cmd.o cmdctl.o
 
 commando.o : commando.c commando.h
