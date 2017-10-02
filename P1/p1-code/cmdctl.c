@@ -37,8 +37,8 @@ void cmdctl_print(cmdctl_t *ctl){
 
 void cmdctl_update_state(cmdctl_t *ctl, int block){
 	cmd_t *current;
-	for (int k = 0; k<clt->size; k++){
-		current = ctl->cmd[i];
+	for (int k = 0; k < ctl->size; k++){
+		current = ctl->cmd[k];
 		cmd_update_state(current,block);
 	}
 }
@@ -47,8 +47,8 @@ void cmdctl_update_state(cmdctl_t *ctl, int block){
 
 void cmdctl_freeall(cmdctl_t *ctl){
 	cmd_t *current;
-	for (int k = 0; k<clt->size; k++){
-		current = ctl->cmd[i];
+	for (int k = 0; k < ctl->size; k++){
+		current = ctl->cmd[k];
 		cmd_free(current);
 	}
 }
