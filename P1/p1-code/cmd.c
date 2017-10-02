@@ -1,16 +1,17 @@
-#include <sctdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "commando.h"
 // cmd.c
 
 cmd_t *cmd_new(char *argv[]){
         cmd_t *cmd = malloc(sizeof (cmd_t));
-        cmd->name = strdup(argv[0]);
-        for(int i=0; i = ARG_MAX; i++){
+        for(int i=0; i <= ARG_MAX; i++){
           cmd->argv[i] = strdup(argv[i]);
         }
         cmd->argv[ARG_MAX+1] = NULL;
-        cmd->pid = NULL;
+        strdup(cmd->argv[0]);
+        cmd->pid = -1;
         cmd->out_pipe = NULL;
         cmd->finished = 0;
         cmd->status = -1;
@@ -26,7 +27,7 @@ void cmd_free(cmd_t *cmd){
         }
         free(cmd);
 }
-//void cmd_info(cmd_t *cmd);
+
 void cmd_start(cmd_t *cmd){
         cmd->out_pipe = pipe(int pipes[2]);
         cmd->str_status = snprintf("RUN");
@@ -48,7 +49,7 @@ char *read_all(int fd, int *nread){
     buf = (char *) realloc(buf, 2 * sizeof buf);
     need_space = read(fd,buf,sizeof buf);
   }
-  nread = sizeof buf;
+  nread = (int *) sizeof buf;  // is this the right value?
   buf[(sizeof buf) + 1] = '\0';  // may go outside of buffer range?!?!?
   return buf;
 }
@@ -57,12 +58,12 @@ void cmd_fetch_output(cmd_t *cmd){
     printf("%s[#%d] not finished yet", cmd->name, cmd->pid);
   }
   else{
-    cmd->output = read_all(cmd->out_pipe[PREAD], cmd->output_size);
+    cmd->output = read_all(cmd->out_pipe[PREAD], (int *) cmd->output_size);
     close(cmd->out_pipe[PREAD]);
   }
 }
 void cmd_print_output(cmd_t *cmd){
-  if(cmd->output = NULL){
+  if(cmd->output == NULL){
     printf("%s[#%d] has no output yet", cmd->name, cmd->pid);
   }
   else{
