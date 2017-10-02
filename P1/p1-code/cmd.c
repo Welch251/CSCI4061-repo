@@ -42,7 +42,13 @@ void cmd_start(cmd_t *cmd){
 		close(cmd->out_pipe[PWRITE]);
 	}
 }
-void cmd_fetch_output(cmd_t *cmd);
+char *read_all(int fd, int *nread){
+  char *buf = malloc(BUFSIZE);
+  
+}
+void cmd_fetch_output(cmd_t *cmd){
+
+}
 void cmd_print_output(cmd_t *cmd);
 void cmd_update_state(cmd_t *cmd, int nohang){
 	if (cmd->finished != 1){
