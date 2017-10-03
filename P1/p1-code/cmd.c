@@ -84,7 +84,6 @@ void cmd_update_state(cmd_t *cmd, int nohang){
 			snprintf(cmd->str_status, STATUS_LEN, "EXIT(%d)", cmd->status);
 			cmd_fetch_output(cmd);
 			printf("@!!! %s[#%d]: %s", cmd->name, cmd->pid, cmd->str_status);
-
 		}
 	}
 }
