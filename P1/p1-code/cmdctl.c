@@ -1,8 +1,9 @@
 #include "commando.h"
 
 void cmdctl_add(cmdctl_t *ctl, cmd_t *cmd){
-	ctl->cmd[ctl->size] = cmd;
-	ctl->size = ctl->size + 1;
+	curr_size = ctl->size;
+	ctl->cmd[curr_size] = cmd;
+	ctl->size = curr_size + 1;
 }
 // Add the given cmd to the ctl structure. update the cmd[] array and
 // size field.
