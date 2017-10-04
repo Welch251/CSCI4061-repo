@@ -44,18 +44,19 @@ int main(){
       cmdctl_print(ctl);
     }
     else if(strcmp(tokens[0], "pause nanos secs") != 0){
-      pause_for(tokens[1],tokens[2]);
+      pause_for(atoi(tokens[1]),atoi(tokens[2]));
     }
     else if(strcmp(tokens[0], "output-for int") != 0){
       cmd_fetch_output(ctl->cmd[atoi(tokens[1])]);
     }
     else if(strcmp(tokens[0], "output-all") != 0){
       for (int i = 0; i<ctl->size;i++){
-          cmd_fetch_output(ctl->cmd[tokens[1]]);
+          cmd_fetch_output(ctl->cmd[atoi(tokens[1])]);
       }
     }
     else if(strcmp(tokens[0], "wait-for") != 0){
-       cmd * process = ctl->cmd[tokens[1]];
+       cmd * process = ctl->cmd[atoi(tokens[1])];
+       cmd_update_state(process,DOBLOCK);
        waitpid(process->pid);
     }
     else if(strcmp(tokens[0], "wait-all") != 0){
@@ -66,7 +67,7 @@ int main(){
         cmdctl_add(ctl, new_command);
     }
     //this is the last part of the function, it updates the state of all processes
-    cmdctl_update_state(ctl, block);
+    cmdctl_update_state(ctl, WNOHANG);
   }
   cmdctl_freeall(ctl);
-} 
+}
