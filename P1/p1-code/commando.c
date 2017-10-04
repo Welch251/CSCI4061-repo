@@ -3,18 +3,24 @@
 
 int main(){
   setvbuf(stdout, NULL, _IONBF, 0); // Turn off output buffering
-  char *built_i;
+  /* allocate the cmdctl structure */
+  cmdctl_t *ctl = malloc(sizeof (cmdctl_t));
+  ctl->size = 0;
+  int echo_status = 0;
+  if(strcmp(argv[0],"--echo") || COMMANDO_ECHO != NULL){
+    echo_status = 1;
+  }
   while(1){
     printf("@> ");
     char str[MAX_LINE];
     char *success;
-    success = fgets(str, MAX_LINE, STDIN);
+    success = fgets(str, MAX_LINE, stdin);
     if(success == NULL){
       printf("End of input");
       break;
     }
-    if /*test argv[1] || COMMANDO_ECHO != NULL */  {
-      print("%s", *str)
+    if(echo_status){
+      printf("%s\n", str);
     }
     int *ntok;
     char *tokens[];
@@ -35,18 +41,18 @@ int main(){
       break;
     }
     else if(strcmp(tokens[0], "list") != 0){
-      cmdctl_print(/*ctl */);
+      cmdctl_print(ctl);
     }
-    else if(strcmp(tokens[0], "pause") != 0){
+    else if(strcmp(tokens[0], "pause nanos secs") != 0){
       pause_for(tokens[1],tokens[2]);
     }
-    else if(strcmp(tokens[0], "output-for") != 0){
-      cmd_fetch_output(/*ctl->cmd[tokens[1]]*/);
+    else if(strcmp(tokens[0], "output-for int") != 0){
+      cmd_fetch_output(ctl->cmd[atoi(tokens[1])]);
     }
     else if(strcmp(tokens[0], "output-all") != 0){
-      for (int i = 0; i</*ctl->size*/;i++){
-          cmd_fetch_output(/*ctl->cmd[tokens[1]]*/);
-          }
+      for (int i = 0; i<ctl->size;i++){
+          cmd_fetch_output(ctl->cmd[tokens[1]]);
+      }
     }
     else if(strcmp(tokens[0], "wait-for") != 0){
        cmd * process = ctl->cmd[tokens[1]];
@@ -55,8 +61,12 @@ int main(){
     else if(strcmp(tokens[0], "wait-all") != 0){
        wait(NULL);
     }
+    else{
+        cmd_t * new_command = cmd_new(tokens);
+        cmdctl_add(ctl, new_command);
+    }
     //this is the last part of the function, it updates the state of all processes
-    cmdctl_update_state(/*ctl, block */);
+    cmdctl_update_state(ctl, block);
   }
-  cmdctl_freeall(/* ctl */);
-}
+  cmdctl_freeall(ctl);
+} 
