@@ -5,33 +5,37 @@
 // cmd.c
 
 cmd_t *cmd_new(char *argv[]){
-        cmd_t *cmd = malloc(sizeof (cmd_t));
-        for(int i=0; i <= ARG_MAX; i++){
-          cmd->argv[i] = strdup(argv[i]);
-        }
-        cmd->argv[ARG_MAX+1] = NULL;
-        strdup(cmd->argv[0]);
-        cmd->pid = -1;
-        cmd->out_pipe = NULL;
-        cmd->finished = 0;
-        cmd->status = -1;
-        cmd->str_status = snprintf("INIT");
-        cmd->output = NULL;
-        cmd->output_size = -1;
+  cmd_t *cmd = malloc(sizeof (cmd_t));
+  for(int i=0; i <= ARG_MAX; i++){
+    cmd->argv[i] = strdup(argv[i]);
+  }
+  cmd->argv[ARG_MAX+1] = NULL;
+  snprintf(cmd->name, NAME_MAX, "%s",cmd->argv[0]);
+  cmd->name[NAME_MAX+1] = '\0';
+  cmd->pid = -1;
+  cmd->out_pipe[0] = -1;
+  cmd->out_pipe[1] = -1;
+  cmd->finished = 0;
+  cmd->status = -1;
+  snprintf(cmd->str_status, STATUS_LEN, "INIT");
+  cmd->str_status[STATUS_LEN] = '\0';
+  cmd->output = NULL;
+  cmd->output_size = -1;
+  return cmd;
 }
 
 void cmd_free(cmd_t *cmd){
-        //deallocate strings in argv
-        if (cmd->output != NULL){
-          free(cmd->output);
-        }
-        free(cmd);
+  //deallocate strings in argv
+  if (cmd->output != NULL){
+    free(cmd->output);
+  }
+  free(cmd);
 }
 
 void cmd_start(cmd_t *cmd){
-        cmd->out_pipe = pipe(int pipes[2]);
-        cmd->str_status = snprintf("RUN");
-        cmd->pid = fork();
+  pipe(cmd->out_pipe);
+  snprintf(cmd->str_status, STATUS_LEN, "RUN");
+  cmd->pid = fork();
 	if (cmd->pid == 0){
 		dup2(PWRITE,cmd->out_pipe[PWRITE]);
 		close(cmd->out_pipe[PREAD]);
@@ -72,14 +76,14 @@ void cmd_print_output(cmd_t *cmd){
 }
 void cmd_update_state(cmd_t *cmd, int nohang){
 	if (cmd->finished != 1){
-		waitpid(cmd->pid,&status,nohang);
+    int *status;
+		waitpid(cmd->pid, status, nohang);
 		if (WIFEXITED(status)){
 			cmd->finished = 1;
 			cmd->status = WEXITSTATUS(status);
-			cmd->str_status = sprintf("EXIT(%d)",cmd->status);
+			snprintf(cmd->str_status, STATUS_LEN, "EXIT(%d)", cmd->status);
 			cmd_fetch_output(cmd);
-			printf("@!!! %s[#%d]: %s",cmd->name,cmd->pid, cmd->str_status);
-
+			printf("@!!! %s[#%d]: %s", cmd->name, cmd->pid, cmd->str_status);
 		}
 	}
 }
