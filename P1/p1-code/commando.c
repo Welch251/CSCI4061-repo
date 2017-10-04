@@ -65,7 +65,6 @@ int main(){
         cmd_t * new_command = cmd_new(tokens);
         cmdctl_add(ctl, new_command);
     }
-
     //this is the last part of the function, it updates the state of all processes
     cmdctl_update_state(ctl, block);
   }
