@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "commando.h"
 
 int main(){
   setvbuf(stdout, NULL, _IONBF, 0); // Turn off output buffering
@@ -40,9 +41,20 @@ int main(){
       pause_for(tokens[1],tokens[2]);
     }
     else if(strcmp(tokens[0], "output-for") != 0){
-      cmd_fetch_output(cmdctl
+      cmd_fetch_output(/*ctl->cmd[tokens[1]]*/);
     }
-
+    else if(strcmp(tokens[0], "output-all") != 0){
+      for (int i = 0; i</*ctl->size*/;i++){
+          cmd_fetch_output(/*ctl->cmd[tokens[1]]*/);
+          }
+    }
+    else if(strcmp(tokens[0], "wait-for") != 0){
+       cmd * process = ctl->cmd[tokens[1]];
+       waitpid(process->pid);
+    }
+    else if(strcmp(tokens[0], "wait-all") != 0){
+       wait(NULL);
+    }
 
     //this is the last part of the function, it updates the state of all processes
     cmdctl_update_state(/*ctl, block */);
