@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include "commando.h"
 
-int main(){
+int main(int argc, char *argv[]){
   setvbuf(stdout, NULL, _IONBF, 0); // Turn off output buffering
   /* allocate the cmdctl structure */
   cmdctl_t *ctl = malloc(sizeof (cmdctl_t));
   ctl->size = 0;
   int echo_status = 0;
-  if(strcmp(argv[0],"--echo") || COMMANDO_ECHO != NULL){
+  if(strcmp(argv[1],"--echo") || getenv("COMMANDO_ECHO") != NULL){
     echo_status = 1;
   }
   while(1){
@@ -54,10 +54,9 @@ int main(){
           cmd_fetch_output(ctl->cmd[atoi(tokens[1])]);
       }
     }
-    else if(strcmp(tokens[0], "wait-for") != 0){
-       cmd * process = ctl->cmd[atoi(tokens[1])];
+    else if(strcmp(tokens[0], "wait-for int") != 0){
+       cmd_t *process = ctl->cmd[atoi(tokens[1])];
        cmd_update_state(process,DOBLOCK);
-       waitpid(process->pid);
     }
     else if(strcmp(tokens[0], "wait-all") != 0){
        wait(NULL);
