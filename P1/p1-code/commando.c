@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "commando.h"
+#include "util.c"
 
 int main(int argc, char *argv[]){
   setvbuf(stdout, NULL, _IONBF, 0); // Turn off output buffering
@@ -22,8 +22,8 @@ int main(int argc, char *argv[]){
     if(echo_status){
       printf("%s\n", str);
     }
-    int *ntok;
-    char *tokens[];
+    int *ntok = NULL;
+    char *tokens[ARG_MAX];
     parse_into_tokens(str, tokens, ntok);
     if(strcmp(tokens[0], "help") != 0){
       printf("\nCOMMANDO COMMANDS\n");

@@ -10,7 +10,7 @@ cmd_t *cmd_new(char *argv[]){
     cmd->argv[i] = strdup(argv[i]);
   }
   cmd->argv[ARG_MAX+1] = NULL;
-  snprintf(cmd->name, NAME_MAX, "%s",cmd->argv[0]);
+  strcpy(cmd->name, cmd->argv[0]);
   cmd->name[NAME_MAX+1] = '\0';
   cmd->pid = -1;
   cmd->out_pipe[0] = -1;
@@ -36,7 +36,7 @@ void cmd_start(cmd_t *cmd){
   pipe(cmd->out_pipe);
   snprintf(cmd->str_status, STATUS_LEN, "RUN");
   cmd->pid = fork();
-	if (cmd->pid == 0){
+	if (cmd->pid == 0){ 
 		dup2(PWRITE,cmd->out_pipe[PWRITE]);
 		close(cmd->out_pipe[PREAD]);
 		execvp(cmd->name,cmd->argv);
@@ -62,7 +62,7 @@ void cmd_fetch_output(cmd_t *cmd){
     printf("%s[#%d] not finished yet", cmd->name, cmd->pid);
   }
   else{
-    cmd->output = read_all(cmd->out_pipe[PREAD], (int *) cmd->output_size);
+    cmd->output = read_all(cmd->out_pipe[PREAD], &cmd->output_size);
     close(cmd->out_pipe[PREAD]);
   }
 }
@@ -76,7 +76,7 @@ void cmd_print_output(cmd_t *cmd){
 }
 void cmd_update_state(cmd_t *cmd, int nohang){
 	if (cmd->finished != 1){
-    int *status;
+    int *status = NULL;
 		waitpid(cmd->pid, status, nohang);
 		if (WIFEXITED(status)){
 			cmd->finished = 1;

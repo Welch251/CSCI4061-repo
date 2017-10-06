@@ -1,7 +1,7 @@
 #include "commando.h"
 
-void cmdctl_add(cmdctl_t *ctl, cmd_t *cmd){
-	curr_size = ctl->size;
+void cmdctl_add(cmdctl_t *ctl, cmd_t *cmd){ 
+	int curr_size = ctl->size;
 	ctl->cmd[curr_size] = cmd;
 	ctl->size = curr_size + 1;
 }

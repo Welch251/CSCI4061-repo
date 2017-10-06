@@ -13,8 +13,20 @@ cmd.o : cmd.c commando.h
 cmdctl.o : cmdctl.c commando.h
 	$(CC) -c cmdctl.c
 
-test-binary : binary_tests.c commando.h tests.h
-	$(CC) -o test-binary binary_tests.c
+binary_tests.o : binary_tests.c commando.h tests.h
+	$(CC) -c $<
+
+test_utils.o : test_utils.c tests.h
+	$(CC) -c $<
+
+binary_tests : binary_tests.o cmd.o cmdctl.o test_utils.o
+	$(CC) -o $@ $^
+
+test-binary : binary_tests
+	valgrind ./binary_tests
+
+test-shell : commando
+	./shell_tests.sh
 
 clean :
 	rm -f *.o
