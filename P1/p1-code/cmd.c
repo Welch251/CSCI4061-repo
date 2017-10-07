@@ -6,7 +6,7 @@
 
 cmd_t *cmd_new(char *argv[]){
   cmd_t *cmd = malloc(sizeof (cmd_t));
-  *cmd->argv = argv;
+  *cmd->argv = *argv;
   cmd->argv[ARG_MAX] = NULL;
   *cmd->name = *strdup(cmd->argv[0]);
   cmd->name[NAME_MAX] = '\0';
