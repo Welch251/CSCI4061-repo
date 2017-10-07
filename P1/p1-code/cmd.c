@@ -48,7 +48,7 @@ void cmd_start(cmd_t *cmd){
 		close(cmd->out_pipe[PWRITE]);
 	}
 }
-char *read_all(int fd, int *nread){
+void *read_all(int fd, int *nread){
   char *buf = (char *) malloc(BUFSIZE);
   int bytes_read = read(fd, buf, BUFSIZE);
   while(bytes_read > 0){
@@ -57,8 +57,8 @@ char *read_all(int fd, int *nread){
   }
   *nread = bytes_read;  // is this the right value?
   buf[bytes_read] = '\0';  // may go outside of buffer range?!?!?
-  return buf;
 }
+
 void cmd_fetch_output(cmd_t *cmd){
   if(!cmd->finished){
     printf("%s[#%d] not finished yet", cmd->name, cmd->pid);
