@@ -23,7 +23,7 @@ binary_tests : binary_tests.o cmd.o cmdctl.o test_utils.o
 	$(CC) -o $@ $^
 
 test-binary : binary_tests
-	valgrind ./binary_tests
+	valgrind --track-origins=yes ./binary_tests
 
 test-shell : commando
 	./shell_tests.sh

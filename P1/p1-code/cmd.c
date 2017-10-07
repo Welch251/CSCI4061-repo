@@ -5,10 +5,14 @@
 // cmd.c
 
 cmd_t *cmd_new(char *argv[]){
-  cmd_t *cmd = malloc(sizeof (cmd_t));
-  *cmd->argv = *argv;
-  cmd->argv[ARG_MAX] = NULL;
-  *cmd->name = *strdup(cmd->argv[0]);
+  cmd_t *cmd = malloc(sizeof(cmd_t));
+  int i = 0;
+  while(argv[i] != NULL){
+    cmd->argv[i] = strdup(argv[i]);
+    i++;
+  }
+  cmd->argv[i] = NULL;
+  snprintf(cmd->name, NAME_MAX, "%s", cmd->argv[0]);
   cmd->name[NAME_MAX] = '\0';
   cmd->pid = -1;
   cmd->out_pipe[0] = -1;
