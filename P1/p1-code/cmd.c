@@ -6,12 +6,10 @@
 
 cmd_t *cmd_new(char *argv[]){
   cmd_t *cmd = malloc(sizeof (cmd_t));
-  for(int i=0; i <= ARG_MAX; i++){
-    cmd->argv[i] = strdup(argv[i]);
-  }
-  cmd->argv[ARG_MAX+1] = NULL;
-  strcpy(cmd->name, cmd->argv[0]);
-  cmd->name[NAME_MAX+1] = '\0';
+  *cmd->argv = argv;
+  cmd->argv[ARG_MAX] = NULL;
+  *cmd->name = *strdup(cmd->argv[0]);
+  cmd->name[NAME_MAX] = '\0';
   cmd->pid = -1;
   cmd->out_pipe[0] = -1;
   cmd->out_pipe[1] = -1;
@@ -36,7 +34,7 @@ void cmd_start(cmd_t *cmd){
   pipe(cmd->out_pipe);
   snprintf(cmd->str_status, STATUS_LEN, "RUN");
   cmd->pid = fork();
-	if (cmd->pid == 0){ 
+	if (cmd->pid == 0){
 		dup2(PWRITE,cmd->out_pipe[PWRITE]);
 		close(cmd->out_pipe[PREAD]);
 		execvp(cmd->name,cmd->argv);

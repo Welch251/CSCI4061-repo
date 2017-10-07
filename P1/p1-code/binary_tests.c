@@ -135,7 +135,7 @@ BEGTEST(read_all_1){
     "only have originated in California.\n"
     "\n"
     "-- Edsger Dijkstra\n"
-    "";  
+    "";
   int bytes_read = -1;
   char *actual_read = read_all(fd, &bytes_read);
   int result = close(fd);
@@ -178,7 +178,7 @@ BEGTEST(read_all_2){
     "\n"
     "Abraham Lincoln\n"
     "November 19, 1863\n"
-    "";  
+    "";
   int bytes_read = -1;
   char *actual_read = read_all(fd, &bytes_read);
   int result = close(fd);
@@ -332,7 +332,7 @@ BEGTEST(read_all_3){
     "2941 2942 2943 2944 2945 2946 2947 2948 2949 2950 2951 2952 2953 2954 2955 2956 2957 2958 2959 2960\n"
     "2961 2962 2963 2964 2965 2966 2967 2968 2969 2970 2971 2972 2973 2974 2975 2976 2977 2978 2979 2980\n"
     "2981 2982 2983 2984 2985 2986 2987 2988 2989 2990 2991 2992 2993 2994 2995 2996 2997 2998 2999 3000\n"
-    "";  
+    "";
   int bytes_read = -1;
   char *actual_read = read_all(fd, &bytes_read);
   int result = close(fd);
@@ -343,7 +343,7 @@ BEGTEST(read_all_3){
   free(actual_read);
   ENDTEST();
 }
-  
+
 
 // Tests creation and init of a cmd_t along with cmd_free() to deallocate it
 BEGTEST(cmd_update_1){
@@ -526,7 +526,7 @@ BEGTEST(cmd_print_2){
 // Check for adding a cmd to a cmdctl
 BEGTEST(cmdctl_add_1){
   char *children[][5] = {
-    {"cat","quote.txt",NULL},    
+    {"cat","quote.txt",NULL},
     {"./sleep_print","1","wait for me",NULL},
     {NULL},
   };
@@ -542,7 +542,7 @@ BEGTEST(cmdctl_add_1){
 
 BEGTEST(cmdctl_add_2){
   char *children[][5] = {
-    {"cat","quote.txt",NULL},    
+    {"cat","quote.txt",NULL},
     {"ls","-a","stuff",NULL},
     {"ls","-a","-F","stuff",NULL},
     {"gcc","-o","test_args","test_args.c",NULL},
@@ -562,7 +562,7 @@ BEGTEST(cmdctl_add_2){
 // Check for cmdctl's update
 BEGTEST(cmdctl_update_1){
   char *children[][5] = {
-    {"cat","quote.txt",NULL},    
+    {"cat","quote.txt",NULL},
     {"ls","-a","stuff",NULL},
     {"ls","-a","-F","stuff",NULL},
     {NULL},
@@ -582,7 +582,7 @@ BEGTEST(cmdctl_update_1){
     "@!!! cat[#%d]: EXIT(0)\n"
     "@!!! ls[#%d]: EXIT(0)\n"
     "@!!! ls[#%d]: EXIT(0)\n"
-    "";    
+    "";
   snprintf(expect_alert, BUFSIZE, fmt, ctl->cmd[0]->pid, ctl->cmd[1]->pid, ctl->cmd[2]->pid);
   if( assert_strn_equals("Alert messages do not match", expect_alert, captured_stdout()) ) return;
   cmdctl_freeall(ctl);
@@ -591,7 +591,7 @@ BEGTEST(cmdctl_update_1){
 
 BEGTEST(cmdctl_update_2){
   char *children[][5] = {
-    {"cat","quote.txt",NULL},    
+    {"cat","quote.txt",NULL},
     {"ls","-a","stuff",NULL},
     {"grep","-i", "flurbo ","gettysburg.txt",NULL},
     {"ls","-a","-F","stuff",NULL},
@@ -615,7 +615,7 @@ BEGTEST(cmdctl_update_2){
     "@!!! grep[#%d]: EXIT(1)\n"
     "@!!! ls[#%d]: EXIT(0)\n"
     "@!!! gcc[#%d]: EXIT(0)\n"
-    "";    
+    "";
   snprintf(expect_alert, BUFSIZE, fmt,
            ctl->cmd[0]->pid, ctl->cmd[1]->pid, ctl->cmd[2]->pid, ctl->cmd[3]->pid, ctl->cmd[4]->pid);
   if( assert_strn_equals("Alert messages do not match", expect_alert, captured_stdout()) ) return;
@@ -625,7 +625,7 @@ BEGTEST(cmdctl_update_2){
 
 BEGTEST(cmdctl_print_1){
   char *children[][5] = {
-    {"cat","quote.txt",NULL},    
+    {"cat","quote.txt",NULL},
     {"ls","-a","stuff",NULL},
     {"ls","-a","-F","stuff",NULL},
     {NULL},
@@ -684,7 +684,7 @@ BEGTEST(cmdctl_print_1){
 
 BEGTEST(cmdctl_print_2){
   char *children[][5] = {
-    {"cat","quote.txt",NULL},    
+    {"cat","quote.txt",NULL},
     {"ls","-a","stuff",NULL},
     {"grep","-i", "flurbo","gettysburg.txt",NULL},
     {"ls","-a","-F","stuff",NULL},
