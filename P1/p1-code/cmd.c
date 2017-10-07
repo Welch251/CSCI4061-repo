@@ -49,14 +49,15 @@ void cmd_start(cmd_t *cmd){
 	}
 }
 void *read_all(int fd, int *nread){
-  char *buf = (char *) malloc(BUFSIZE);
+  void *buf = malloc(BUFSIZE);
   int bytes_read = read(fd, buf, BUFSIZE);
-  while(bytes_read > 0){
-    buf = (char *) realloc(buf, 2 * BUFSIZE);
+  while(bytes_read == BUFSIZE){
+    buf = realloc(buf, 2 * BUFSIZE);
     bytes_read = read(fd, buf, BUFSIZE);
   }
-  *nread = bytes_read;  // is this the right value?
-  buf[bytes_read] = '\0';  // may go outside of buffer range?!?!?
+  *nread = bytes_read;
+  buf[bytes_read] = '\0';
+  return buf;
 }
 
 void cmd_fetch_output(cmd_t *cmd){
