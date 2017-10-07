@@ -39,24 +39,24 @@ void cmd_start(cmd_t *cmd){
   snprintf(cmd->str_status, STATUS_LEN, "RUN");
   cmd->pid = fork();
 	if (cmd->pid == 0){
-		dup2(PWRITE,cmd->out_pipe[PWRITE]);
+		dup2(cmd->out_pipe[PWRITE],PWRITE);
 		close(cmd->out_pipe[PREAD]);
 		execvp(cmd->name,cmd->argv);
 	}
 	else{
-		dup2(PREAD,cmd->out_pipe[PREAD]);
+		dup2(cmd->out_pipe[PREAD],PREAD);
 		close(cmd->out_pipe[PWRITE]);
 	}
 }
 char *read_all(int fd, int *nread){
   char *buf = (char *) malloc(BUFSIZE);
-  int need_space = read(fd,buf,sizeof buf);
-  while(need_space > 0){
-    buf = (char *) realloc(buf, 2 * sizeof buf);
-    need_space = read(fd,buf,sizeof buf);
+  int bytes_read = read(fd, buf, BUFSIZE);
+  while(bytes_read > 0){
+    buf = (char *) realloc(buf, 2 * BUFSIZE);
+    bytes_read = read(fd, buf, BUFSIZE);
   }
-  nread = (int *) sizeof buf;  // is this the right value?
-  buf[(sizeof buf) + 1] = '\0';  // may go outside of buffer range?!?!?
+  *nread = bytes_read;  // is this the right value?
+  buf[bytes_read] = '\0';  // may go outside of buffer range?!?!?
   return buf;
 }
 void cmd_fetch_output(cmd_t *cmd){
