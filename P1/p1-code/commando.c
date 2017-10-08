@@ -15,7 +15,7 @@ int main(int argc, char *argv[]){
     char str[MAX_LINE];
     char *success = fgets(str, MAX_LINE, stdin);
     if(success == NULL){
-      printf("End of input");
+      printf("\nEnd of input");
       break;
     }
     if(echo_status){
@@ -46,15 +46,15 @@ int main(int argc, char *argv[]){
     else if(strcmp(tokens[0], "pause nanos secs") == 0){
       pause_for(atoi(tokens[1]),atoi(tokens[2]));
     }
-    else if(strcmp(tokens[0], "output-for int") == 0){
+    else if(strcmp(tokens[0], "output-for") == 0){
       cmd_fetch_output(ctl->cmd[atoi(tokens[1])]);
     }
     else if(strcmp(tokens[0], "output-all") == 0){
       for (int i = 0; i<ctl->size;i++){
-        cmd_fetch_output(ctl->cmd[atoi(tokens[1])]);
+        cmd_fetch_output(ctl->cmd[atoi(tokens[i])]);
       }
     }
-    else if(strcmp(tokens[0], "wait-for int") == 0){
+    else if(strcmp(tokens[0], "wait-for") == 0){
       cmd_t *process = ctl->cmd[atoi(tokens[1])];
       cmd_update_state(process,DOBLOCK);
     }
@@ -63,6 +63,7 @@ int main(int argc, char *argv[]){
     }
     else{
       cmd_t * new_command = cmd_new(tokens);
+      cmd_start(new_command);
       cmdctl_add(ctl, new_command);
     }
     //this is the last part of the function, it updates the state of all processes
