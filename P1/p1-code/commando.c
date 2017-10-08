@@ -43,7 +43,7 @@ int main(int argc, char *argv[]){
     else if(strcmp(tokens[0], "list") == 0){
       cmdctl_print(ctl);
     }
-    else if(strcmp(tokens[0], "pause nanos secs") == 0){
+    else if(strcmp(tokens[0], "pause") == 0){
       pause_for(atoi(tokens[1]),atoi(tokens[2]));
     }
     else if(strcmp(tokens[0], "output-for") == 0){
