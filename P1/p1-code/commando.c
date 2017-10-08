@@ -47,16 +47,25 @@ int main(int argc, char *argv[]){
       pause_for(atoi(tokens[1]),atoi(tokens[2]));
     }
     else if(strcmp(tokens[0], "output-for") == 0){
-      cmd_fetch_output(ctl->cmd[atoi(tokens[1])]);
+      cmd_t *cmd = ctl->cmd[atoi(tokens[1])];
+      printf("@<<< Output for %s[#%d] (%d bytes):\n", cmd->name, cmd->pid,
+        cmd->output_size);
+      printf("----------------------------------------\n");
+      cmd_print_output(cmd);
+      printf("----------------------------------------\n");
     }
     else if(strcmp(tokens[0], "output-all") == 0){
       for (int i = 0; i<ctl->size;i++){
-        cmd_fetch_output(ctl->cmd[atoi(tokens[i])]);
+        cmd_t *cmd = ctl->cmd[atoi(tokens[i])];
+        printf("@<<< Output for %s[#%d] (%d bytes):\n", cmd->name, cmd->pid,
+          cmd->output_size);
+        printf("----------------------------------------\n");
+        cmd_print_output(cmd);
+        printf("----------------------------------------\n");
       }
     }
     else if(strcmp(tokens[0], "wait-for") == 0){
-      cmd_t *process = ctl->cmd[atoi(tokens[1])];
-      cmd_update_state(process,DOBLOCK);
+      cmd_update_state(ctl->cmd[atoi(tokens[1])],DOBLOCK);
     }
     else if(strcmp(tokens[0], "wait-all") == 0){
       wait(NULL);
