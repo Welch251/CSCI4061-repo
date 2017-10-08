@@ -55,7 +55,7 @@ void *read_all(int fd, int *nread){
   int bytes_read = read(fd, buf, b_size);
   total_bytes_read += bytes_read;
   while(bytes_read > 0){
-    if(bytes_read == b_size){
+    if(total_bytes_read == b_size){
       b_size *= 2;
       buf = (char *) realloc(buf, b_size);
     }
@@ -85,8 +85,8 @@ void cmd_print_output(cmd_t *cmd){
 }
 void cmd_update_state(cmd_t *cmd, int nohang){
 	if (cmd->finished != 1){
-    int *status = NULL;
-		waitpid(cmd->pid, status, nohang);
+    int status;
+		waitpid(cmd->pid, &status, nohang);
 		if (WIFEXITED(status)){
 			cmd->finished = 1;
 			cmd->status = WEXITSTATUS(status);
