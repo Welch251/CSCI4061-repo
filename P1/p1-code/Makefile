@@ -1,8 +1,8 @@
 CFLAGS = -Wall -g
 CC = gcc $(CFLAGS)
 
-commando : commando.o cmd.o cmdctl.o commando.h
-	$(CC) -o commando commando.o cmd.o cmdctl.o
+commando : commando.o cmd.o cmdctl.o util.o commando.h
+	$(CC) -o commando commando.o cmd.o cmdctl.o util.o
 
 commando.o : commando.c commando.h
 	$(CC) -c commando.c
@@ -12,6 +12,9 @@ cmd.o : cmd.c commando.h
 
 cmdctl.o : cmdctl.c commando.h
 	$(CC) -c cmdctl.c
+
+util.o : util.c commando.h
+	$(CC) -c util.c
 
 binary_tests.o : binary_tests.c commando.h tests.h
 	$(CC) -c $<

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "util.c"
+#include "commando.h"
 
 int main(int argc, char *argv[]){
   setvbuf(stdout, NULL, _IONBF, 0); // Turn off output buffering
