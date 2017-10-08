@@ -29,4 +29,4 @@ test-shell : commando
 	./shell_tests.sh
 
 clean :
-	rm -f *.o
+	rm -f *.o actual.txt expect.txt valgrind.txt
