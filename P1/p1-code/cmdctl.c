@@ -1,6 +1,6 @@
 #include "commando.h"
 
-void cmdctl_add(cmdctl_t *ctl, cmd_t *cmd){ 
+void cmdctl_add(cmdctl_t *ctl, cmd_t *cmd){
 	int curr_size = ctl->size;
 	ctl->cmd[curr_size] = cmd;
 	ctl->size = curr_size + 1;
@@ -9,12 +9,18 @@ void cmdctl_add(cmdctl_t *ctl, cmd_t *cmd){
 // size field.
 
 void cmdctl_print(cmdctl_t *ctl){
-	printf("JOB  #PID      STAT   STR_STAT OUTB COMMAND");
+	printf("JOB  #PID      STAT   STR_STAT OUTB COMMAND\n");
 	cmd_t *current;
 	for (int i = 0; i<ctl->size; i++){
 		current = ctl->cmd[i];
-		printf("%-4d #%-8d %4d %10s %4d %s", i, current->pid, current->status,
-			current->str_status, current->output_size, current->name);
+		printf("%-4d #%-8d %4d %10s %4d ", i, current->pid, current->status,
+			current->str_status, current->output_size);
+			int j = 0;
+		while(current->argv[j] != NULL){
+			printf("%s ", current->argv[j]);
+			j++;
+		}
+		printf("\n");
 	}
 }
 // Print all cmd elements in the given ctl structure.  The format of
