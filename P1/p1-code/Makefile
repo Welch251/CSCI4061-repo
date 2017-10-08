@@ -33,3 +33,6 @@ test-shell : commando
 
 clean :
 	rm -f *.o actual.txt expect.txt valgrind.txt
+
+realclean :
+	rm -f *.o actual.std binary_tests commando expect.std test_args
