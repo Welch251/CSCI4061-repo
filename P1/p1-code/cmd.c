@@ -27,7 +27,11 @@ cmd_t *cmd_new(char *argv[]){
 }
 
 void cmd_free(cmd_t *cmd){
-  //deallocate strings in argv
+  int i = 0;
+  while(cmd->argv[i] != NULL){
+    free(cmd->argv[i]);
+    i++;
+  }
   if (cmd->output != NULL){
     free(cmd->output);
   }
