@@ -49,15 +49,17 @@ void cmd_start(cmd_t *cmd){
 	}
 }
 void *read_all(int fd, int *nread){
-  char *buf = malloc(BUFSIZE);
+  int b_size = BUFSIZE;
+  char *buf = (char *) malloc(b_size+1);
   int total_bytes_read = 0;
-  int bytes_read = read(fd, buf, BUFSIZE);
+  int bytes_read = read(fd, buf, b_size);
   total_bytes_read += bytes_read;
   while(bytes_read > 0){
-    if(bytes_read == BUFSIZE){
-      buf = realloc(buf, BUFSIZE*2);
+    if(bytes_read == b_size){
+      b_size *= 2;
+      buf = (char *) realloc(buf, b_size);
     }
-    bytes_read = read(fd, buf, sizeof(*buf));
+    bytes_read = read(fd, buf + total_bytes_read, b_size - total_bytes_read);
     total_bytes_read += bytes_read;
   }
   *nread = total_bytes_read;
