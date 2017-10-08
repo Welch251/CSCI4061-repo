@@ -55,8 +55,8 @@ int main(int argc, char *argv[]){
       printf("----------------------------------------\n");
     }
     else if(strcmp(tokens[0], "output-all") == 0){
-      for (int i = 0; i<ctl->size;i++){
-        cmd_t *cmd = ctl->cmd[atoi(tokens[i])];
+      for(int i = 0; i < ctl->size; i++){
+        cmd_t *cmd = ctl->cmd[i];
         printf("@<<< Output for %s[#%d] (%d bytes):\n", cmd->name, cmd->pid,
           cmd->output_size);
         printf("----------------------------------------\n");
@@ -68,7 +68,9 @@ int main(int argc, char *argv[]){
       cmd_update_state(ctl->cmd[atoi(tokens[1])],DOBLOCK);
     }
     else if(strcmp(tokens[0], "wait-all") == 0){
-      wait(NULL);
+      for(int i = 0; i < ctl->size; i++){
+        cmd_update_state(ctl->cmd[i],DOBLOCK);
+      }
     }
     else{
       cmd_t * new_command = cmd_new(tokens);
@@ -76,7 +78,7 @@ int main(int argc, char *argv[]){
       cmdctl_add(ctl, new_command);
     }
     //this is the last part of the function, it updates the state of all processes
-    cmdctl_update_state(ctl, WNOHANG);
+    cmdctl_update_state(ctl, NOBLOCK);
   }
   cmdctl_freeall(ctl);
   free(ctl);

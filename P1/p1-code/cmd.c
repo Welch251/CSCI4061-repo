@@ -72,7 +72,7 @@ void *read_all(int fd, int *nread){
 }
 void cmd_fetch_output(cmd_t *cmd){
   if(!cmd->finished){
-    printf("%s[#%d] not finished yet", cmd->name, cmd->pid);
+    printf("%s[#%d] not finished yet\n", cmd->name, cmd->pid);
   }
   else{
     cmd->output = read_all(cmd->out_pipe[PREAD], &cmd->output_size);
@@ -81,7 +81,7 @@ void cmd_fetch_output(cmd_t *cmd){
 }
 void cmd_print_output(cmd_t *cmd){
   if(cmd->output == NULL){
-    printf("%s[#%d] has no output yet", cmd->name, cmd->pid);
+    printf("%s[#%d] has no output yet\n", cmd->name, cmd->pid);
   }
   else{
     write(STDOUT_FILENO, cmd->output, cmd->output_size);
@@ -90,13 +90,14 @@ void cmd_print_output(cmd_t *cmd){
 void cmd_update_state(cmd_t *cmd, int nohang){
 	if (cmd->finished != 1){
     int status;
-		waitpid(cmd->pid, &status, nohang);
-		if (WIFEXITED(status)){
-			cmd->finished = 1;
-			cmd->status = WEXITSTATUS(status);
-			snprintf(cmd->str_status, STATUS_LEN, "EXIT(%d)", cmd->status);
-			cmd_fetch_output(cmd);
-			printf("@!!! %s[#%d]: %s\n", cmd->name, cmd->pid, cmd->str_status);
-		}
+		if (waitpid(cmd->pid, &status, nohang) > 0){
+  		if (WIFEXITED(status)){
+  			cmd->finished = 1;
+  			cmd->status = WEXITSTATUS(status);
+  			snprintf(cmd->str_status, STATUS_LEN, "EXIT(%d)", cmd->status);
+  			cmd_fetch_output(cmd);
+  			printf("@!!! %s[#%d]: %s\n", cmd->name, cmd->pid, cmd->str_status);
+  		}
+    }
 	}
 }
