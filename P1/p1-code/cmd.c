@@ -54,15 +54,16 @@ void *read_all(int fd, int *nread){
   int bytes_read = read(fd, buf, BUFSIZE);
   total_bytes_read += bytes_read;
   while(bytes_read > 0){
-    buf = realloc(buf, 2 * BUFSIZE);
-    bytes_read = read(fd, buf, BUFSIZE);
+    if(bytes_read == BUFSIZE){
+      buf = realloc(buf, BUFSIZE*2);
+    }
+    bytes_read = read(fd, buf, sizeof(*buf));
     total_bytes_read += bytes_read;
   }
   *nread = total_bytes_read;
   buf[total_bytes_read] = '\0';
   return buf;
 }
-
 void cmd_fetch_output(cmd_t *cmd){
   if(!cmd->finished){
     printf("%s[#%d] not finished yet", cmd->name, cmd->pid);
@@ -89,7 +90,7 @@ void cmd_update_state(cmd_t *cmd, int nohang){
 			cmd->status = WEXITSTATUS(status);
 			snprintf(cmd->str_status, STATUS_LEN, "EXIT(%d)", cmd->status);
 			cmd_fetch_output(cmd);
-			printf("@!!! %s[#%d]: %s", cmd->name, cmd->pid, cmd->str_status);
+			printf("@!!! %s[#%d]: %s\n", cmd->name, cmd->pid, cmd->str_status);
 		}
 	}
 }
