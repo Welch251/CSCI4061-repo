@@ -49,9 +49,13 @@ void cmd_free(cmd_t *cmd){
 void cmd_start(cmd_t *cmd){
   pipe(cmd->out_pipe);											                   // Sets pipe elements as file descriptors
   snprintf(cmd->str_status, STATUS_LEN, "RUN");								 // Sets the process status to RUN
-  cmd->pid = fork();											                     // Sets the process as a child
-	if (cmd->pid == 0){										                       // Redirects the child's write output from the screen to the pipe
-		dup2(cmd->out_pipe[PWRITE],PWRITE);
+  cmd->pid = fork();
+  if(cmd->pid < 0){
+    eprintf("Fork failed");                                    // The fork failed.
+    exit(1);                                                   // Exit with error status code
+  }
+	else if(cmd->pid == 0){										                   // Check if the cmd->pid is for the child
+		dup2(cmd->out_pipe[PWRITE],PWRITE);                        // Redirects the child's write output from the screen to the pipe
 		close(cmd->out_pipe[PREAD]);								               // Closes the pipe's read input on the child's end
 		execvp(cmd->name,cmd->argv);								               // Executes the process
 	}
