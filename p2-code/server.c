@@ -1,7 +1,7 @@
 #include "blather.h"
 
 client_t *server_get_client(server_t *server, int idx){
-
+  return server->client[idx];
 }
 void server_start(server_t *server, char *server_name, int perms){
 
