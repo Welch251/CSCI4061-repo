@@ -1,6 +1,12 @@
 These 1 or 2 people worked on this project together and will share a
 grade for it.
 
+<<<<<<< HEAD
+PARTNER 1:
+
+PARTNER 2:
+=======
 PARTNER 1: Evan Welch
 
 PARTNER 2: Jakob Urnes
+>>>>>>> 88f3c165658aea87f6e74285b5ab6c51a0634b5c
