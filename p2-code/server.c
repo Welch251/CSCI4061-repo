@@ -13,7 +13,7 @@ void server_start(server_t *server, char *server_name, int perms){
   }
   server->join_fd = open(server->server_name, perms);
   if(server->join_fd < 0){
-    printf("fifo can't be opened");
+    printf("join fifo can't be opened");
     exit(0);
   }
   server->join_ready = 1;
@@ -30,7 +30,7 @@ void server_shutdown(server_t *server){
   while(server->n_clients > 0){
     ret = write(server->client[server->n_clients-1]->to_client_fd,msg,sizeof(mesg_t));
     if(ret < 0){
-      printf("write to client failed");
+      printf("server shutdown write to client failed");
       exit(0);
     }
     server->client[server->n_clients-1] = NULL;
@@ -61,13 +61,22 @@ int server_add_client(server_t *server, join_t *join){
   return 0;
 }
 int server_remove_client(server_t *server, int idx){
-
+  close(server->client[idx]->to_client_fd);
+  close(server->client[idx]->to_server_fd);
+  remove(server->client[idx]->to_client_fname);
+  remove(server->client[idx]->to_server_fname);
+  for(int i = idx+1, i < server->n_clients, i++){
+    server->client[i-1] = server->client[i];
+  }
+  server->n_clients--;
 }
 int server_broadcast(server_t *server, mesg_t *mesg){
-
+  for(int i = 0, i < server->n_clients, i++){
+    write(server->client[i]->to_client_fd, mesg, sizeof(mesg_t));
+  }
 }
 void server_check_sources(server_t *server){
-
+  
 }
 int server_join_ready(server_t *server){
 
