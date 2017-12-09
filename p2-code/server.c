@@ -40,8 +40,25 @@ void server_shutdown(server_t *server){
 int server_add_client(server_t *server, join_t *join){
   client_t *client;
   snprintf(client->name, MAXPATH, join->name);
-  snprintf(client->name, MAXPATH, join->name);
-  snprintf(client->name, MAXPATH, join->name);
+  snprintf(client->to_client_fname, MAXPATH, join->to_client_fname);
+  snprintf(client->to_server_fname, MAXPATH, join->to_server_fname);
+  client->to_client_fd = open(client->to_client_fname, O_WRONLY);
+  if(client->to_client_fd < 0){
+    printf("to client fifo can't be opened");
+    exit(0);
+  }
+  client->to_server_fd = open(client->to_server_fname, O_RONLY);
+  if(client->to_server_fd < 0){
+    printf("to server fifo can't be opened");
+    exit(0);
+  }
+  client->data_ready = 0;
+  if(server->n_clients == MAXCLIENTS){
+    return 1;
+  }
+  server->client[server->n_clients] = client;
+  server->n_clients++;
+  return 0;
 }
 int server_remove_client(server_t *server, int idx){
 
