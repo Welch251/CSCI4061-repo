@@ -1,0 +1,10 @@
+# Authors: Evan Welch & Jakob Urnes
+
+CFLAGS = -Wall -g
+CC = gcc $(CFLAGS)
+
+bl-client : bl-client.o simpio.o util.o blather.h
+         $(CC) -o bl-client bl-client.o simpio.o util.o 
+
+bl-client.o : bl-client.c blather.h
+         $(CC)  -lpthread -c bl-client.c 

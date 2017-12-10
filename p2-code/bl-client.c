@@ -9,11 +9,21 @@ client_t *client = &client_actual;
 pthread_t user_thread;          // thread managing user input
 pthread_t server_thread;	// thread managing server input
 
+struct arg_struct {
+    int arg1;
+    char * arg2;
+};
+
+typedef enum { false, true } bool;
+
 // Worker thread to manage user input
 void *user_feed(void *arg){
+  struct arg_struct *args = (struct arg_struct *)arg;
+  int ts_fd = args->arg1;
+  char * user_name = args->arg2;
   mesg_t *mesg_to_s;
   snprintf(mesg_to_s->name, MAXNAME, "%s", user_name);
-  while(!simpio->end_of_input){
+  while(!simpio->end_of_input) {
     simpio_reset(simpio);
     iprintf(simpio, "");                                          // print prompt
     while(!simpio->line_ready && !simpio->end_of_input){          // read until line is complete
@@ -33,6 +43,7 @@ void *user_feed(void *arg){
 
 // Worker thread to listen to the info from the server.
 void *server_feed(void *arg){
+  int tc_fd = (int) arg;
   while (1){
     mesg_t *mesg_to_c;
     read(tc_fd, mesg_to_c, sizeof(mesg_t));
@@ -91,6 +102,10 @@ int main(int argc, char *argv[]){
   ts_fd = open(user_fname_ts, O_WRONLY);
 
 
+  struct arg_struct args;
+  args.arg1 = ts_fd;
+  args.arg2 = user_name;
+
   write(serv_fd, join, sizeof(join_t));		//Write join request to server's FIFO
 
   char prompt[MAXNAME];
@@ -100,8 +115,8 @@ int main(int argc, char *argv[]){
   simpio_noncanonical_terminal_mode();       // set the terminal into a compatible mode
 
 
-  pthread_create(&user_thread, NULL, user_feed, NULL);
-  pthread_create(&server_thread, NULL, server_feed, NULL);
+  pthread_create(&user_thread, NULL, user_feed, (void *) &args);
+  pthread_create(&server_thread, NULL, server_feed, (void *) (tc_fd));
   pthread_join(user_thread, NULL);
   pthread_join(server_thread, NULL);
 
