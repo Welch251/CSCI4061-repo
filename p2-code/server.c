@@ -29,7 +29,7 @@ void server_shutdown(server_t *server){
   msg->body = NULL;
   while(server->n_clients > 0){
     client_t client = server_get_client(server, server->n_clients-1);
-    ret = write(client->to_client_fd,msg,sizeof(mesg_t));
+    ret = write(client->to_client_fd, msg, sizeof(mesg_t));
     if(ret < 0){
       printf("server shutdown write to client failed");
       exit(0);
@@ -112,6 +112,11 @@ int server_handle_join(server_t *server){
     join_t *join;
     read(server->join_fd, join, sizeof(join_t));
     server_add_client(server, join);
+    client_t client = server_get_client(server, server->n_clients-1);
+    mesg_t *mesg;
+    strncpy(mesg->name, client->name, MAXNAME);
+    mesg->kind = BL_JOINED;
+    server_broadcast(server, mesg);
     server->join_ready = 0;
   }
 }
