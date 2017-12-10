@@ -16,7 +16,7 @@ void server_start(server_t *server, char *server_name, int perms){
     printf("join fifo can't be opened");
     exit(0);
   }
-  server->join_ready = 1;
+  server->join_ready = 0;
   server->n_clients = 0;
   sever->client = NULL;
 }
@@ -76,19 +76,52 @@ int server_broadcast(server_t *server, mesg_t *mesg){
   }
 }
 void server_check_sources(server_t *server){
-  
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(server->join_fd, &fds);
+  for(int i = 0, i < server->n_clients, i++){
+    FD_SET(server->client[i]->to_server_fd, &fds);
+  }
+  n = server->client[n_clients-1]->to_server_fd-1;
+  ret = select(n, &fds, NULL, NULL, NULL);
+  if(ret < 0){
+    printf("the select for server_check_sources failed");
+    exit(0);
+  } else{
+      // At least one file descriptor has data ready
+      if(FD_ISSET(server->join_fd, &fds)){
+        server->join_ready = 1;
+      }
+      for(int i = 0, i < server->n_clients, i++){
+        client = server->client[i];
+        if(FD_ISSET(client->to_server_fd, &fds)){
+          client->data_ready = 1;
+        }
+      }
+  }
 }
 int server_join_ready(server_t *server){
-
+  return server->join_ready;
 }
 int server_handle_join(server_t *server){
-
+  if(server_join_ready(server)){
+    join_t *join;
+    read(server->join_fd, join, sizeof(join_t));
+    server_add_client(server, join);
+    server->join_ready = 0;
+  }
 }
 int server_client_ready(server_t *server, int idx){
-
+  return server->client[idx]->data_ready;
 }
 int server_handle_client(server_t *server, int idx){
-
+  if(server_client_ready(server, idx)){
+    mesg_t *mesg;
+    read(server->client[idx]->to_server_fd, mesg, sizeof(mesg_t));
+    if(mesg->kind == BL_MESG || mesg->kind == BL_DEPARTED){
+      server_broadcast(server, mesg);
+    }
+  }
 }
 void server_tick(server_t *server){
 
