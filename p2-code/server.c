@@ -28,20 +28,21 @@ void server_shutdown(server_t *server){
   msg->name = NULL;
   msg->body = NULL;
   while(server->n_clients > 0){
-    ret = write(server->client[server->n_clients-1]->to_client_fd,msg,sizeof(mesg_t));
+    client_t client = server_get_client(server, server->n_clients-1);
+    ret = write(client->to_client_fd,msg,sizeof(mesg_t));
     if(ret < 0){
       printf("server shutdown write to client failed");
       exit(0);
     }
-    server->client[server->n_clients-1] = NULL;
+    client = NULL;
     server->n_clients--;
   }
 }
 int server_add_client(server_t *server, join_t *join){
   client_t *client;
-  snprintf(client->name, MAXPATH, join->name);
-  snprintf(client->to_client_fname, MAXPATH, join->to_client_fname);
-  snprintf(client->to_server_fname, MAXPATH, join->to_server_fname);
+  strncpy(client->name, join->name, MAXPATH);
+  strncpy(client->to_client_fname, join->to_client_fname, MAXPATH);
+  strncpy(client->to_server_fname, join->to_server_fname, MAXPATH);
   client->to_client_fd = open(client->to_client_fname, O_WRONLY);
   if(client->to_client_fd < 0){
     printf("to client fifo can't be opened");
@@ -61,18 +62,20 @@ int server_add_client(server_t *server, join_t *join){
   return 0;
 }
 int server_remove_client(server_t *server, int idx){
-  close(server->client[idx]->to_client_fd);
-  close(server->client[idx]->to_server_fd);
-  remove(server->client[idx]->to_client_fname);
-  remove(server->client[idx]->to_server_fname);
+  client = server_get_client(server, idx);
+  close(client->to_client_fd);
+  close(client->to_server_fd);
+  remove(client->to_client_fname);
+  remove(client->to_server_fname);
   for(int i = idx+1, i < server->n_clients, i++){
-    server->client[i-1] = server->client[i];
+    server->client[i-1] = server_get_client(server, i);
   }
   server->n_clients--;
 }
 int server_broadcast(server_t *server, mesg_t *mesg){
   for(int i = 0, i < server->n_clients, i++){
-    write(server->client[i]->to_client_fd, mesg, sizeof(mesg_t));
+    client_t client = server_get_client(server, i);
+    write(client->to_client_fd, mesg, sizeof(mesg_t));
   }
 }
 void server_check_sources(server_t *server){
@@ -80,9 +83,10 @@ void server_check_sources(server_t *server){
   FD_ZERO(&fds);
   FD_SET(server->join_fd, &fds);
   for(int i = 0, i < server->n_clients, i++){
-    FD_SET(server->client[i]->to_server_fd, &fds);
+    client_t client = server_get_client(server, i);
+    FD_SET(client->to_server_fd, &fds);
   }
-  n = server->client[n_clients-1]->to_server_fd-1;
+  n = server_get_client(server, server->n_clients-1)->to_server_fd-1;
   ret = select(n, &fds, NULL, NULL, NULL);
   if(ret < 0){
     printf("the select for server_check_sources failed");
@@ -93,7 +97,7 @@ void server_check_sources(server_t *server){
         server->join_ready = 1;
       }
       for(int i = 0, i < server->n_clients, i++){
-        client = server->client[i];
+        client_t client = server->client[i];
         if(FD_ISSET(client->to_server_fd, &fds)){
           client->data_ready = 1;
         }
@@ -112,12 +116,14 @@ int server_handle_join(server_t *server){
   }
 }
 int server_client_ready(server_t *server, int idx){
-  return server->client[idx]->data_ready;
+  client_t client = server_get_client(server, idx);
+  return client->data_ready;
 }
 int server_handle_client(server_t *server, int idx){
   if(server_client_ready(server, idx)){
     mesg_t *mesg;
-    read(server->client[idx]->to_server_fd, mesg, sizeof(mesg_t));
+    client_t client = server_get_client(server, idx);
+    read(client->to_server_fd, mesg, sizeof(mesg_t));
     if(mesg->kind == BL_MESG || mesg->kind == BL_DEPARTED){
       server_broadcast(server, mesg);
     }
