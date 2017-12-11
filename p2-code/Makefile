@@ -24,5 +24,12 @@ bl-client : bl-client.o simpio.o util.o blather.h
 bl-client.o : bl-client.c blather.h
 	$(CC) -lpthread -c bl-client.c
 
+shell-tests : shell_tests.sh shell_tests_data.sh clean-tests
+	chmod u+rx shell_tests.sh shell_tests_data.sh normalize.awk filter-semopen-bug.awk
+	./shell_tests.sh
+
 clean :
 	rm -f *.o
+
+clean-tests :
+	rm -f test-*.{log,out,expect,diff,valgrindout}

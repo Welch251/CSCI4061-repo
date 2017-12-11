@@ -4,7 +4,7 @@ client_t *server_get_client(server_t *server, int idx){
   return &server->client[idx];
 }
 void server_start(server_t *server, char *server_name, int perms){
-  strncpy(server->server_name, server_name, MAXPATH);
+  snprintf(server->server_name, MAXPATH-1, "%s", server_name);
   remove(server->server_name);
   int ret = mkfifo(server->server_name, perms);
   if(ret < 0){
@@ -22,11 +22,12 @@ void server_start(server_t *server, char *server_name, int perms){
 void server_shutdown(server_t *server){
   close(server->join_fd);
   remove(server->server_name);
-  mesg_t *msg = NULL;
-  msg->kind = BL_SHUTDOWN;
+  mesg_t msg;
+  mesg_t *mesg = &msg;
+  mesg->kind = BL_SHUTDOWN;
   while(server->n_clients > 0){
     client_t *client = server_get_client(server, server->n_clients-1);
-    int ret = write(client->to_client_fd, msg, sizeof(mesg_t));
+    int ret = write(client->to_client_fd, &msg, sizeof(mesg_t));
     if(ret < 0){
       printf("server shutdown write to client failed");
       exit(0);
@@ -36,7 +37,8 @@ void server_shutdown(server_t *server){
   }
 }
 int server_add_client(server_t *server, join_t *join){
-  client_t *client = NULL;
+  client_t client_actual;
+  client_t *client = &client_actual;
   strncpy(client->name, join->name, MAXPATH);
   strncpy(client->to_client_fname, join->to_client_fname, MAXPATH);
   strncpy(client->to_server_fname, join->to_server_fname, MAXPATH);
@@ -112,18 +114,19 @@ int server_join_ready(server_t *server){
 }
 int server_handle_join(server_t *server){
   if(server_join_ready(server)){
-    join_t *join = NULL;
-    int ret = read(server->join_fd, join, sizeof(join_t));
+    join_t join;
+    int ret = read(server->join_fd, &join, sizeof(join_t));
     if(ret < 0){
       printf("read failed");
       exit(0);
     }
-    server_add_client(server, join);
+    server_add_client(server, &join);
     client_t *client = server_get_client(server, server->n_clients-1);
-    mesg_t *mesg = NULL;
+    mesg_t msg;
+    mesg_t *mesg = &msg;
     strncpy(mesg->name, client->name, MAXNAME);
     mesg->kind = BL_JOINED;
-    server_broadcast(server, mesg);
+    server_broadcast(server, &msg);
     server->join_ready = 0;
   }
   return 0;
@@ -134,15 +137,16 @@ int server_client_ready(server_t *server, int idx){
 }
 int server_handle_client(server_t *server, int idx){
   if(server_client_ready(server, idx)){
-    mesg_t *mesg = NULL;
+    mesg_t msg;
+    mesg_t *mesg = &msg;
     client_t *client = server_get_client(server, idx);
-    int ret = read(client->to_server_fd, mesg, sizeof(mesg_t));
+    int ret = read(client->to_server_fd, &msg, sizeof(mesg_t));
     if(ret < 0){
       printf("read failed");
       exit(0);
     }
     if(mesg->kind == BL_MESG || mesg->kind == BL_DEPARTED){
-      server_broadcast(server, mesg);
+      server_broadcast(server, &msg);
     }
   }
   return 0;
