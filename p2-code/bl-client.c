@@ -11,7 +11,7 @@ pthread_t server_thread;	// thread managing server input
 
 struct arg_struct {
     int arg1;
-    char * arg2;
+    char *arg2;
 };
 
 typedef enum { false, true } bool;
@@ -21,7 +21,8 @@ void *user_feed(void *arg){
   struct arg_struct *args = (struct arg_struct *)arg;
   int ts_fd = args->arg1;
   char * user_name = args->arg2;
-  mesg_t *mesg_to_s;
+  mesg_t msg;
+  mesg_t *mesg_to_s = &msg;
   snprintf(mesg_to_s->name, MAXNAME, "%s", user_name);
   while(!simpio->end_of_input) {
     simpio_reset(simpio);
@@ -30,10 +31,11 @@ void *user_feed(void *arg){
       simpio_get_char(simpio);
     }
     if(simpio->line_ready){
-      mesg_t *mesg_to_s;
-      snprintf(mesg_to_s->body, MAXLINE, "%s", simpio->buf);
-      mesg_to_s->kind = BL_MESG;
-      write(ts_fd, mesg_to_s, sizeof(mesg_t));
+      mesg_t mesg;
+      mesg_t *mesg_to_server = &mesg;
+      snprintf(mesg_to_server->body, MAXLINE, "%s", simpio->buf);
+      mesg_to_server->kind = BL_MESG;
+      write(ts_fd, mesg_to_server, sizeof(mesg_t));
     }
   }
 
@@ -43,9 +45,11 @@ void *user_feed(void *arg){
 
 // Worker thread to listen to the info from the server.
 void *server_feed(void *arg){
-  int tc_fd = (int) arg;
+  struct arg_struct *args = (struct arg_struct *)arg;
+  int tc_fd = args->arg1;
   while (1){
-    mesg_t *mesg_to_c;
+    mesg_t mesg;
+    mesg_t *mesg_to_c = &mesg;
     read(tc_fd, mesg_to_c, sizeof(mesg_t));
     char terminal_mesg[MAXLINE];
     if (mesg_to_c->kind == BL_MESG){
@@ -60,21 +64,21 @@ void *server_feed(void *arg){
     else if (mesg_to_c->kind == BL_SHUTDOWN){
       snprintf(terminal_mesg, MAXLINE, "!!! sunnyvale is shutting down !!!");
     }
-    iprintf(simpio, terminal_mesg); 
+    iprintf(simpio, terminal_mesg);
   }
   return NULL;
 }
 
 
 int main(int argc, char *argv[]){
-  char * serv_fname = argv[1];			//Retrieve name info from input
-  char * user_name = argv[2];
+  char *serv_fname = argv[1];			//Retrieve name info from input
+  char *user_name = argv[2];
   char user_fname_tc[MAXPATH];			//Char arrays that will contain the full fifo names
   char user_fname_ts[MAXPATH];
 
-  bool shutdown = false;			//Status on whether or not server has shut down
+  //bool shutdown = false;			//Status on whether or not server has shut down
 
-  bool user;
+  //bool user;
 
   int serv_fd;					//File descriptor for server FIFO
   int tc_fd;					//File descriptor for to-client FIFO
@@ -89,9 +93,9 @@ int main(int argc, char *argv[]){
 
   mkfifo(user_fname_tc, S_IRUSR | S_IWUSR);	//Make to-client FIFO
   mkfifo(user_fname_ts, S_IRUSR | S_IWUSR);     //Make to-server FIFO
- 
 
-  join_t *join;					//Create join request struct
+  join_t join_actual;
+  join_t *join = &join_actual;					//Create join request struct
 
   snprintf(join->name, MAXPATH, "%s", user_name); //Send user name info to join struct
   snprintf(join->to_client_fname, MAXPATH, "%s", user_fname_tc); //Send to-client name info to join struct
@@ -106,6 +110,10 @@ int main(int argc, char *argv[]){
   args.arg1 = ts_fd;
   args.arg2 = user_name;
 
+  struct arg_struct args2;
+  args2.arg1 = tc_fd;
+  args2.arg2 = serv_fname;
+
   write(serv_fd, join, sizeof(join_t));		//Write join request to server's FIFO
 
   char prompt[MAXNAME];
@@ -116,7 +124,7 @@ int main(int argc, char *argv[]){
 
 
   pthread_create(&user_thread, NULL, user_feed, (void *) &args);
-  pthread_create(&server_thread, NULL, server_feed, (void *) (tc_fd));
+  pthread_create(&server_thread, NULL, server_feed, (void *) &args2);
   pthread_join(user_thread, NULL);
   pthread_join(server_thread, NULL);
 

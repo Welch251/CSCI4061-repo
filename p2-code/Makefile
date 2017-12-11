@@ -3,6 +3,8 @@
 CFLAGS = -Wall -g
 CC = gcc $(CFLAGS)
 
+all : bl-server bl-client
+
 bl-server : bl-server.o server.o simpio.o util.o blather.h
 	$(CC) -o bl-server bl-server.o server.o simpio.o util.o
 
@@ -19,13 +21,13 @@ simpio.o : simpio.c blather.h
 	$(CC) -c simpio.c
 
 bl-client : bl-client.o simpio.o util.o blather.h
-	$(CC) -o bl-client bl-client.o simpio.o util.o
+	$(CC) -o bl-client bl-client.o simpio.o util.o -lpthread
 
 bl-client.o : bl-client.c blather.h
-	$(CC) -lpthread -c bl-client.c
+	$(CC) -c bl-client.c
 
-shell-tests : shell_tests.sh shell_tests_data.sh clean-tests
-	chmod u+rx shell_tests.sh shell_tests_data.sh normalize.awk filter-semopen-bug.awk
+shell-tests : shell_tests.sh shell_tests_data.sh cat-sig.sh clean-tests
+	chmod u+rx shell_tests.sh shell_tests_data.sh cat-sig.sh normalize.awk filter-semopen-bug.awk
 	./shell_tests.sh
 
 clean :

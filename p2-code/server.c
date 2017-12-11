@@ -27,7 +27,7 @@ void server_shutdown(server_t *server){
   mesg->kind = BL_SHUTDOWN;
   while(server->n_clients > 0){
     client_t *client = server_get_client(server, server->n_clients-1);
-    int ret = write(client->to_client_fd, &msg, sizeof(mesg_t));
+    int ret = write(client->to_client_fd, mesg, sizeof(mesg_t));
     if(ret < 0){
       printf("server shutdown write to client failed");
       exit(0);
@@ -126,7 +126,7 @@ int server_handle_join(server_t *server){
     mesg_t *mesg = &msg;
     strncpy(mesg->name, client->name, MAXNAME);
     mesg->kind = BL_JOINED;
-    server_broadcast(server, &msg);
+    server_broadcast(server, mesg);
     server->join_ready = 0;
   }
   return 0;
@@ -140,13 +140,13 @@ int server_handle_client(server_t *server, int idx){
     mesg_t msg;
     mesg_t *mesg = &msg;
     client_t *client = server_get_client(server, idx);
-    int ret = read(client->to_server_fd, &msg, sizeof(mesg_t));
+    int ret = read(client->to_server_fd, mesg, sizeof(mesg_t));
     if(ret < 0){
       printf("read failed");
       exit(0);
     }
     if(mesg->kind == BL_MESG || mesg->kind == BL_DEPARTED){
-      server_broadcast(server, &msg);
+      server_broadcast(server, mesg);
     }
   }
   return 0;
