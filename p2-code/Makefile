@@ -35,3 +35,6 @@ clean :
 
 clean-tests :
 	rm -f test-*.{log,out,expect,diff,valgrindout}
+
+real-clean :
+	rm -f *.o bl-server bl-client
