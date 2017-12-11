@@ -4,7 +4,7 @@ client_t *server_get_client(server_t *server, int idx){
   return &server->client[idx];
 }
 void server_start(server_t *server, char *server_name, int perms){
-  snprintf(server->server_name, MAXPATH, "%s", server_name);
+  strncpy(server->server_name, server_name, MAXPATH);
   remove(server->server_name);
   int ret = mkfifo(server->server_name, perms);
   if(ret < 0){

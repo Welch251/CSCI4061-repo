@@ -12,6 +12,12 @@ bl-server.o : bl-server.c blather.h
 server.o : server.c blather.h
 	$(CC) -c server.c
 
+util.o : util.c blather.h
+	$(CC) -c util.c
+
+simpio.o : simpio.c blather.h
+	$(CC) -c simpio.c
+
 bl-client : bl-client.o simpio.o util.o blather.h
 	$(CC) -o bl-client bl-client.o simpio.o util.o
 
