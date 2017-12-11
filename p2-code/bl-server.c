@@ -8,7 +8,7 @@ void sig_handler(int signo) {
 
 int main(int argc, char *argv[]){
   char * serv_fname = argv[1];
-  struct server_t *server;
+  server_t *server;
   server_start(server, serv_fname, DEFAULT_PERMS);
   signal(SIGTERM, sig_handler);
   signal(SIGINT, sig_handler);
