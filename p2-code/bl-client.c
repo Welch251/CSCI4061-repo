@@ -6,7 +6,7 @@ simpio_t *simpio = &simpio_actual;
 client_t client_actual;
 client_t *client = &client_actual;
 
-pthread_t user_thread;          // thread managing user input
+pthread_t user_thread;    // thread managing user input
 pthread_t server_thread;	// thread managing server input
 
 struct arg_struct {
@@ -91,8 +91,8 @@ int main(int argc, char *argv[]){
   strcat(user_fname_ts,user_name);
   strcat(user_fname_ts,"_to_srv");
 
-  mkfifo(user_fname_tc, S_IRUSR | S_IWUSR);	//Make to-client FIFO
-  mkfifo(user_fname_ts, S_IRUSR | S_IWUSR);     //Make to-server FIFO
+  mkfifo(user_fname_tc, DEFAULT_PERMS);	//Make to-client FIFO
+  mkfifo(user_fname_ts, DEFAULT_PERMS);     //Make to-server FIFO
 
   join_t join_actual;
   join_t *join = &join_actual;					//Create join request struct
@@ -104,7 +104,6 @@ int main(int argc, char *argv[]){
   serv_fd = open(serv_fname, O_RDWR); 		//Open the server's FIFO
   tc_fd = open(user_fname_tc, O_RDONLY);
   ts_fd = open(user_fname_ts, O_WRONLY);
-
 
   struct arg_struct args;
   args.arg1 = ts_fd;

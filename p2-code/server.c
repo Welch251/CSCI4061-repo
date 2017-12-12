@@ -29,7 +29,7 @@ void server_shutdown(server_t *server){
     client_t *client = server_get_client(server, server->n_clients-1);
     int ret = write(client->to_client_fd, mesg, sizeof(mesg_t));
     if(ret < 0){
-      printf("server shutdown write to client failed");
+      printf("server shutdown write to client failed\n");
       exit(0);
     }
     client = NULL;
@@ -39,17 +39,17 @@ void server_shutdown(server_t *server){
 int server_add_client(server_t *server, join_t *join){
   client_t client_actual;
   client_t *client = &client_actual;
-  strncpy(client->name, join->name, MAXPATH);
-  strncpy(client->to_client_fname, join->to_client_fname, MAXPATH);
-  strncpy(client->to_server_fname, join->to_server_fname, MAXPATH);
+  snprintf(client->name, MAXPATH-1, "%s", join->name);
+  snprintf(client->to_client_fname, MAXPATH-1, "%s", join->to_client_fname);
+  snprintf(client->to_server_fname, MAXPATH-1, "%s", join->to_server_fname);
   client->to_client_fd = open(client->to_client_fname, O_WRONLY);
   if(client->to_client_fd < 0){
-    printf("to client fifo can't be opened");
+    printf("to client fifo can't be opened\n");
     exit(0);
   }
   client->to_server_fd = open(client->to_server_fname, O_RDONLY);
   if(client->to_server_fd < 0){
-    printf("to server fifo can't be opened");
+    printf("to server fifo can't be opened\n");
     exit(0);
   }
   client->data_ready = 0;
@@ -77,7 +77,7 @@ int server_broadcast(server_t *server, mesg_t *mesg){
     client_t *client = server_get_client(server, i);
     int ret = write(client->to_client_fd, mesg, sizeof(mesg_t));
     if(ret < 0){
-      printf("write failed");
+      printf("write failed\n");
       exit(0);
     }
   }
@@ -86,15 +86,15 @@ int server_broadcast(server_t *server, mesg_t *mesg){
 void server_check_sources(server_t *server){
   fd_set fds;
   FD_ZERO(&fds);
-  FD_SET(server->join_fd, &fds);
   for(int i = 0; i < server->n_clients; i++){
     client_t *client = server_get_client(server, i);
     FD_SET(client->to_server_fd, &fds);
   }
-  int n = server_get_client(server, server->n_clients-1)->to_server_fd-1;
+  FD_SET(server->join_fd, &fds);
+  int n = server->join_fd+1;
   int ret = select(n, &fds, NULL, NULL, NULL);
   if(ret < 0){
-    printf("the select for server_check_sources failed");
+    printf("the select for server_check_sources failed\n");
     exit(0);
   } else{
       // At least one file descriptor has data ready
@@ -117,7 +117,7 @@ int server_handle_join(server_t *server){
     join_t join;
     int ret = read(server->join_fd, &join, sizeof(join_t));
     if(ret < 0){
-      printf("read failed");
+      printf("read failed\n");
       exit(0);
     }
     server_add_client(server, &join);
@@ -142,7 +142,7 @@ int server_handle_client(server_t *server, int idx){
     client_t *client = server_get_client(server, idx);
     int ret = read(client->to_server_fd, mesg, sizeof(mesg_t));
     if(ret < 0){
-      printf("read failed");
+      printf("read failed\n");
       exit(0);
     }
     if(mesg->kind == BL_MESG || mesg->kind == BL_DEPARTED){
