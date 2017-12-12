@@ -6,7 +6,7 @@ simpio_t *simpio = &simpio_actual;
 client_t client_actual;
 client_t *client = &client_actual;
 
-pthread_t user_thread;    // thread managing user input
+pthread_t user_thread;          // thread managing user input
 pthread_t server_thread;	// thread managing server input
 
 struct arg_struct {
@@ -19,7 +19,7 @@ typedef enum { false, true } bool;
 // Worker thread to manage user input
 void *user_feed(void *arg){
   struct arg_struct *args = (struct arg_struct *)arg;
-  int ts_fd = open(args->arg1, O_RDWR);				  //Open the to-server FIFO
+  int ts_fd = open(args->arg1, O_WRONLY);				  //Open the to-server FIFO
   char * user_name = args->arg2;
   mesg_t msg;
   mesg_t *mesg_to_s = &msg;
@@ -48,7 +48,7 @@ void *user_feed(void *arg){
 // Worker thread to listen to the info from the server.
 void *server_feed(void *arg){
   char * user_fname_tc = (char *)arg;
-  int tc_fd = open(user_fname_tc, O_RDWR);				//Open the to-client FIFO
+  int tc_fd = open(user_fname_tc, O_RDONLY);				//Open the to-client FIFO
   while (1){
     //Critical 
     mesg_t mesg;
@@ -77,7 +77,7 @@ void *server_feed(void *arg){
 int main(int argc, char *argv[]){
 
   if(argc != 3){
-    printf("usage: %s <server name> <user name> \n",argv[0]);
+    printf("usage: %s <program> <int>\n",argv[0]);
     exit(0);
   }
 
@@ -102,8 +102,8 @@ int main(int argc, char *argv[]){
   strcat(user_fname_ts,user_name);
   strcat(user_fname_ts,"_to_srv");
 
-  mkfifo(user_fname_tc, DEFAULT_PERMS);	//Make to-client FIFO
-  mkfifo(user_fname_ts, DEFAULT_PERMS);     //Make to-server FIFO
+  mkfifo(user_fname_tc, S_IRUSR | S_IWUSR);	//Make to-client FIFO
+  mkfifo(user_fname_ts, S_IRUSR | S_IWUSR);     //Make to-server FIFO
 
 
   join_t join_actual;
@@ -114,6 +114,7 @@ int main(int argc, char *argv[]){
   snprintf(join->to_server_fname, MAXPATH, "%s", user_fname_ts); //Send to-server name info to join struct
 
   serv_fd = open(serv_fname, O_RDWR); 		//Open the server's FIFO
+
 
   struct arg_struct args;
   args.arg1 = user_fname_ts;
