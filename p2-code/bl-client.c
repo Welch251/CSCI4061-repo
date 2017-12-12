@@ -77,7 +77,7 @@ void *server_feed(void *arg){
 int main(int argc, char *argv[]){
 
   if(argc != 3){
-    printf("usage: %s <program> <int>\n",argv[0]);
+    printf("usage: %s <server name> <user name> \n",argv[0]);
     exit(0);
   }
 

@@ -7,6 +7,11 @@ void sig_handler(int signo) {
 }
 
 int main(int argc, char *argv[]){
+  if(argc != 2){
+    printf("usage: %s <server name> \n",argv[0]);
+    exit(0);
+  }
+
   char * serv_fname = argv[1];
   server_t server;
   server_t *serv = &server;
@@ -22,6 +27,6 @@ int main(int argc, char *argv[]){
       }
     }
   }
-  server_shutdown(serv);
+  server_shutdown(serv); 
   return 0;
 }
