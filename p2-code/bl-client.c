@@ -28,17 +28,18 @@ void *user_feed(void *arg){
     //Critical
     simpio_reset(simpio);
     iprintf(simpio, "");                         // print prompt
-    simpio_get_char(simpio);
+    while(!simpio->line_ready && !simpio->end_of_input){
+      simpio_get_char(simpio);
+    }
     if(simpio->line_ready){
       snprintf(mesg_to_s->body, MAXLINE, "%s", simpio->buf);
       mesg_to_s->kind = BL_MESG;
       write(ts_fd, mesg_to_s, sizeof(mesg_t));
     }
-    mesg_to_s->kind = BL_DEPARTED;
-    write(ts_fd, mesg_to_s, sizeof(mesg_t));
     //Region
   }
-
+  mesg_to_s->kind = BL_DEPARTED;
+  write(ts_fd, mesg_to_s, sizeof(mesg_t));
   pthread_cancel(server_thread); // kill the background thread
   return NULL;
 }
