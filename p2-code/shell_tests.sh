@@ -171,4 +171,3 @@ major_sep
 printf "OVERALL:\n"
 printf "%2d / %2d Normal correct\n" "$NPASS" "$NTESTS"
 printf "%2d / %2d Valgrind correct\n" "$NVALG" "$VTESTS"
-
