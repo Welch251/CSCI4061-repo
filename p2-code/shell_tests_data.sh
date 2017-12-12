@@ -38,7 +38,7 @@ function client_print () {
   mesg="$2"
   echo -e "$mesg" > ${tid}-${client}.fifo
 #  echo -e "$mesg" ${tid}-${client}.fifo
-  # printf "%s\n" "$mesg" > ${client}.fifo
+  printf "%s\n" "$mesg" > ${client}.fifo
 }
 
 function client_close () {
