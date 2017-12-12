@@ -86,7 +86,7 @@ read -r -d '' teardown[$T] <<"EOF"
 EOF
 read -r -d '' expect_outs[$T] <<"EOF"
 -- Bruce JOINED --
-Bruce>> 
+Bruce>>
 EOF
 
 # # Server and single client, single message
@@ -106,7 +106,7 @@ EOF
 # read -r -d '' expect_outs[$T] <<"EOF"
 # -- Bruce JOINED --
 # [Bruce] : This is a test
-# Bruce>> 
+# Bruce>>
 # EOF
 
 # Server and single client, multiple messages
@@ -130,7 +130,7 @@ read -r -d '' expect_outs[$T] <<"EOF"
 [Bruce] : This is a test
 [Bruce] : Is anyone there
 [Bruce] : Alfreeeed!
-Bruce>> 
+Bruce>>
 EOF
 
 # Server and two clients, no messages
@@ -151,7 +151,7 @@ EOF
 read -r -d '' expect_outs[$T] <<"EOF"
 -- Bruce JOINED --	-- Clark JOINED --
 -- Clark JOINED --	-- Bruce DEPARTED --
-Bruce>> 	Clark>> 
+Bruce>> 	Clark>>
 EOF
 
 # Server and two clients, single message
@@ -163,7 +163,7 @@ read -r -d '' actions[$T] <<"EOF"
 server_spawn
 client_spawn Bruce
 client_spawn Clark
-client_print Bruce "Hey big guy\n" 
+client_print Bruce "Hey big guy\n"
 client_close Bruce
 client_close Clark
 server_close
@@ -174,7 +174,7 @@ read -r -d '' expect_outs[$T] <<"EOF"
 -- Bruce JOINED --	-- Clark JOINED --
 -- Clark JOINED --	[Bruce] : Hey big guy
 [Bruce] : Hey big guy	-- Bruce DEPARTED --
-Bruce>> 	Clark>> 
+Bruce>> 	Clark>>
 EOF
 
 # Server and two clients, multiple messages
@@ -186,13 +186,13 @@ read -r -d '' actions[$T] <<"EOF"
 server_spawn
 client_spawn Bruce
 client_spawn Clark
-client_print Bruce "Hey big guy\n" 
-client_print Bruce "What's happen'?\n" 
-client_print Clark "Not much, how about you?\n" 
-client_print Bruce "Hangin' out..." 
-client_print Bruce "In the BATCAVE" 
-client_print Clark "I figured..." 
-client_print Clark "I'm out" 
+client_print Bruce "Hey big guy\n"
+client_print Bruce "What's happen'?\n"
+client_print Clark "Not much, how about you?\n"
+client_print Bruce "Hangin' out..."
+client_print Bruce "In the BATCAVE"
+client_print Clark "I figured..."
+client_print Clark "I'm out"
 client_close Clark
 client_close Bruce
 server_close
@@ -208,9 +208,9 @@ read -r -d '' expect_outs[$T] <<"EOF"
 [Bruce] : Hangin' out...	[Bruce] : In the BATCAVE
 [Bruce] : In the BATCAVE	[Clark] : I figured...
 [Clark] : I figured...	[Clark] : I'm out
-[Clark] : I'm out	Clark>> 
--- Clark DEPARTED --	
-Bruce>> 	
+[Clark] : I'm out	Clark>>
+-- Clark DEPARTED --
+Bruce>>
 EOF
 
 # Server and two clients, multiple messages, one client remains
@@ -222,9 +222,9 @@ read -r -d '' actions[$T] <<"EOF"
 server_spawn
 client_spawn Bruce
 client_spawn Clark
-client_print Bruce "Hello\n" 
+client_print Bruce "Hello\n"
 client_print Clark "Yo\n"
-client_print Bruce "bye\n" 
+client_print Bruce "bye\n"
 client_close Bruce
 client_print Clark "guess I'm all alone\n"
 client_print Clark "this is lame\n"
@@ -241,7 +241,7 @@ read -r -d '' expect_outs[$T] <<"EOF"
 [Bruce] : bye	-- Bruce DEPARTED --
 Bruce>> 	[Clark] : guess I'm all alone
 	[Clark] : this is lame
-	Clark>> 
+	Clark>>
 EOF
 
 
@@ -254,13 +254,13 @@ read -r -d '' actions[$T] <<"EOF"
 server_spawn
 client_spawn Bruce
 client_spawn Clark
-client_print Bruce "Hello\n" 
+client_print Bruce "Hello\n"
 client_print Clark "Yo\n"
-client_print Bruce "bye\n" 
+client_print Bruce "bye\n"
 client_print Clark "No\n"
-client_print Bruce "Yep\n" 
+client_print Bruce "Yep\n"
 client_print Clark "Wrong\n"
-client_print Bruce "Hah\n" 
+client_print Bruce "Hah\n"
 client_close Clark
 client_print Bruce "grrr\n"
 client_print Bruce "grrr\n"
@@ -278,11 +278,11 @@ read -r -d '' expect_outs[$T] <<"EOF"
 [Clark] : No	[Bruce] : Yep
 [Bruce] : Yep	[Clark] : Wrong
 [Clark] : Wrong	[Bruce] : Hah
-[Bruce] : Hah	Clark>> 
--- Clark DEPARTED --	
-[Bruce] : grrr	
-[Bruce] : grrr	
-Bruce>> 	
+[Bruce] : Hah	Clark>>
+-- Clark DEPARTED --
+[Bruce] : grrr
+[Bruce] : grrr
+Bruce>>
 EOF
 
 # Server and two clients, multiple messages, one client remains
@@ -294,13 +294,13 @@ read -r -d '' actions[$T] <<"EOF"
 server_spawn
 client_spawn Bruce
 client_spawn Clark
-client_print Bruce "Hello\n" 
+client_print Bruce "Hello\n"
 client_print Clark "Yo\n"
-client_print Bruce "bye\n" 
+client_print Bruce "bye\n"
 client_print Clark "No\n"
-client_print Bruce "Yep\n" 
+client_print Bruce "Yep\n"
 client_print Clark "Wrong\n"
-client_print Bruce "Hah\n" 
+client_print Bruce "Hah\n"
 client_print Bruce "grrr\n"
 client_print Bruce "grrr\n"
 client_close Bruce
@@ -327,7 +327,7 @@ read -r -d '' expect_outs[$T] <<"EOF"
 Bruce>> 	[Clark] : Ugh
 	[Clark] : Ugh
 	[Clark] : sigh..
-	Clark>> 
+	Clark>>
 EOF
 
 # Server and two clients, multiple messages, one client rejoins
@@ -339,18 +339,18 @@ read -r -d '' actions[$T] <<"EOF"
 server_spawn
 client_spawn Bruce
 client_spawn Clark
-client_print Bruce "Hello\n" 
+client_print Bruce "Hello\n"
 client_print Clark "Yo\n"
-client_print Bruce "bye\n" 
+client_print Bruce "bye\n"
 client_close Bruce
 client_print Clark "Ugh\n"
 client_spawn Bruce
-client_print Bruce "back\n" 
+client_print Bruce "back\n"
 client_print Clark "great\n"
 client_print Clark "gone\n"
-client_print Bruce "ack\n" 
+client_print Bruce "ack\n"
 client_close Clark
-client_print Bruce "alone\n" 
+client_print Bruce "alone\n"
 client_close Bruce
 server_close
 EOF
@@ -364,11 +364,11 @@ read -r -d '' expect_outs[$T] <<"EOF"
 [Bruce] : ack	-- Bruce DEPARTED --	[Bruce] : ack
 -- Clark DEPARTED --	[Clark] : Ugh	-- Clark DEPARTED --
 [Bruce] : alone	-- Bruce JOINED --	[Bruce] : alone
-Bruce>> 	[Bruce] : back	Bruce>> 
-	[Clark] : great	
-	[Clark] : gone	
-	[Bruce] : ack	
-	Clark>> 	
+Bruce>> 	[Bruce] : back	Bruce>>
+	[Clark] : great
+	[Clark] : gone
+	[Bruce] : ack
+	Clark>>
 EOF
 
 # # Server and two clients, multiple messages, two clients rejoins
@@ -379,22 +379,22 @@ EOF
 # read -r -d '' actions[$T] <<"EOF"
 # server_spawn
 # client_spawn Bruce
-# client_print Bruce "alone\n" 
+# client_print Bruce "alone\n"
 # client_spawn Clark
-# client_print Bruce "Hello\n" 
+# client_print Bruce "Hello\n"
 # client_print Clark "Yo\n"
-# client_print Bruce "bye\n" 
+# client_print Bruce "bye\n"
 # client_close Bruce
 # client_print Clark "Ugh\n"
 # client_spawn Bruce
-# client_print Bruce "back\n" 
+# client_print Bruce "back\n"
 # client_print Clark "great\n"
 # client_print Clark "gone\n"
-# client_print Bruce "ack\n" 
+# client_print Bruce "ack\n"
 # client_close Clark
-# client_print Bruce "alone\n" 
+# client_print Bruce "alone\n"
 # client_spawn Clark
-# client_print Bruce "joy\n" 
+# client_print Bruce "joy\n"
 # client_close Bruce
 # client_close Clark
 # server_close
@@ -405,13 +405,13 @@ EOF
 # -- Bruce JOINED --	-- Clark JOINED --	-- Bruce JOINED --	-- Clark JOINED --
 # [Bruce] : back	[Bruce] : joy	[Bruce] : back	[Bruce] : joy
 # [Clark] : great	-- Bruce DEPARTED --	[Clark] : great	-- Bruce DEPARTED --
-# [Clark] : gone	Clark>> 	[Clark] : gone	Clark>> 
-# [Bruce] : ack		[Bruce] : ack	
-# -- Clark DEPARTED --		-- Clark DEPARTED --	
-# [Bruce] : alone		[Bruce] : alone	
-# -- Clark JOINED --		-- Clark JOINED --	
-# [Bruce] : joy		[Bruce] : joy	
-# Bruce>> 		Bruce>> 	
+# [Clark] : gone	Clark>> 	[Clark] : gone	Clark>>
+# [Bruce] : ack		[Bruce] : ack
+# -- Clark DEPARTED --		-- Clark DEPARTED --
+# [Bruce] : alone		[Bruce] : alone
+# -- Clark JOINED --		-- Clark JOINED --
+# [Bruce] : joy		[Bruce] : joy
+# Bruce>> 		Bruce>>
 # EOF
 
 # Three clients, no messages
@@ -434,10 +434,10 @@ EOF
 read -r -d '' expect_outs[$T] <<"EOF"
 -- Clark JOINED --	-- Bruce JOINED --	-- Lois JOINED --
 -- Bruce JOINED --	-- Lois JOINED --	-- Bruce DEPARTED --
--- Lois JOINED --	Bruce>> 	Lois>> 
--- Bruce DEPARTED --		
--- Lois DEPARTED --		
-Clark>> 		
+-- Lois JOINED --	Bruce>> 	Lois>>
+-- Bruce DEPARTED --
+-- Lois DEPARTED --
+Clark>>
 EOF
 
 # Three clients, one message
@@ -462,10 +462,10 @@ read -r -d '' expect_outs[$T] <<"EOF"
 -- Clark JOINED --	-- Bruce JOINED --	-- Lois JOINED --
 -- Bruce JOINED --	-- Lois JOINED --	[Bruce] : Batman!
 -- Lois JOINED --	[Bruce] : Batman!	-- Bruce DEPARTED --
-[Bruce] : Batman!	Bruce>> 	Lois>> 
--- Bruce DEPARTED --		
--- Lois DEPARTED --		
-Clark>> 		
+[Bruce] : Batman!	Bruce>> 	Lois>>
+-- Bruce DEPARTED --
+-- Lois DEPARTED --
+Clark>>
 EOF
 
 # Three clients, several messages
@@ -499,10 +499,10 @@ read -r -d '' expect_outs[$T] <<"EOF"
 [Clark] : Superman!	[Lois] : Reporter?	[Bruce] : Ha
 [Lois] : Reporter?	[Bruce] : Ha	[Clark] : He he
 [Bruce] : Ha	[Clark] : He he	[Lois] : bite me
-[Clark] : He he	[Lois] : bite me	Lois>> 
-[Lois] : bite me	-- Lois DEPARTED --	
--- Lois DEPARTED --	-- Clark DEPARTED --	
-Clark>> 	Bruce>> 	
+[Clark] : He he	[Lois] : bite me	Lois>>
+[Lois] : bite me	-- Lois DEPARTED --
+-- Lois DEPARTED --	-- Clark DEPARTED --
+Clark>> 	Bruce>>
 EOF
 
 # Three clients, several messages before/after full join
@@ -543,14 +543,14 @@ read -r -d '' expect_outs[$T] <<"EOF"
 [Bruce] : Batman!	[Lois] : Not again	[Clark] : He he
 [Clark] : Superman!	[Bruce] : Vanish!	[Lois] : Lame
 [Lois] : Not again	Bruce>> 	[Clark] : Yup
-[Bruce] : Vanish!		Lois>> 
--- Bruce DEPARTED --		
-[Clark] : He he		
-[Lois] : Lame		
-[Clark] : Yup		
--- Lois DEPARTED --		
-[Clark] : Fortress of solitude		
-Clark>> 		
+[Bruce] : Vanish!		Lois>>
+-- Bruce DEPARTED --
+[Clark] : He he
+[Lois] : Lame
+[Clark] : Yup
+-- Lois DEPARTED --
+[Clark] : Fortress of solitude
+Clark>>
 EOF
 
 # Three clients with rejoins and messages
@@ -596,16 +596,16 @@ read -r -d '' expect_outs[$T] <<"EOF"
 -- Bruce1 JOINED --	[Clark1] : Superman!	[Lois1] : Not again	Bruce2>> 	-- Lois1 DEPARTED --	[Bruce3] : Kryptonite!
 [Bruce1] : Batman!	Bruce1>> 	-- Bruce2 JOINED --		[Clark2] : Fortress of solitude	-- Clark2 DEPARTED --
 [Clark1] : Superman!		[Bruce2] : Vanish!		-- Bruce3 JOINED --	[Bruce3] : Batman!
--- Bruce1 DEPARTED --		-- Bruce2 DEPARTED --		[Bruce3] : From the shadows!	Bruce3>> 
--- Lois1 JOINED --		[Clark1] : He he		[Bruce3] : Kryptonite!	
-[Clark1] : Superman!		[Clark1] : Super speed		Clark2>> 	
-[Lois1] : Not again		-- Clark1 DEPARTED --			
--- Bruce2 JOINED --		[Lois1] : Lame			
-[Bruce2] : Vanish!		-- Clark2 JOINED --			
--- Bruce2 DEPARTED --		[Clark2] : Yup - super hearing			
-[Clark1] : He he		Lois1>> 			
-[Clark1] : Super speed					
-Clark1>> 					
+-- Bruce1 DEPARTED --		-- Bruce2 DEPARTED --		[Bruce3] : From the shadows!	Bruce3>>
+-- Lois1 JOINED --		[Clark1] : He he		[Bruce3] : Kryptonite!
+[Clark1] : Superman!		[Clark1] : Super speed		Clark2>>
+[Lois1] : Not again		-- Clark1 DEPARTED --
+-- Bruce2 JOINED --		[Lois1] : Lame
+[Bruce2] : Vanish!		-- Clark2 JOINED --
+-- Bruce2 DEPARTED --		[Clark2] : Yup - super hearing
+[Clark1] : He he		Lois1>>
+[Clark1] : Super speed
+Clark1>>
 EOF
 
 # Four clients messages
@@ -626,7 +626,7 @@ client_spawn Lois
 client_print Lois "Gentlemen"
 client_print Clark "Lois, what's up\n"
 client_print Bruce "I am the night!\n"
-client_spawn Barbara 
+client_spawn Barbara
 client_print Lois "Can anyone control him"
 client_print Barbara "nope\n"
 client_print Clark "not me, keeps throwing green rocks at me\n"
@@ -641,7 +641,7 @@ client_print Clark "You end up in a wheel chair?\n"
 client_print Barbara ">:-(\n"
 client_print Bruce "Whoa, that's insensitive"
 client_print Clark "Ummm, sorry?"
-client_close Clark 
+client_close Clark
 client_print Barbara "And I thought you were rude"
 client_print Bruce "I am rude"
 client_print Bruce "I'm whatever this city needs me to be"
@@ -678,16 +678,16 @@ read -r -d '' expect_outs[$T] <<"EOF"
 -- Lois DEPARTED --	[Barbara] : Keep antagonizing me and watch what happens		[Bruce] : Because I'm BATMAN
 [Barbara] : Keep antagonizing me and watch what happens	[Clark] : You end up in a wheel chair?		-- Bruce DEPARTED --
 [Clark] : You end up in a wheel chair?	[Barbara] : >:-(		[Barbara] : I've got to find a different server
-[Barbara] : >:-(	[Bruce] : Whoa, that's insensitive		Barbara>> 
-[Bruce] : Whoa, that's insensitive	[Clark] : Ummm, sorry?		
-[Clark] : Ummm, sorry?	Clark>> 		
--- Clark DEPARTED --			
-[Barbara] : And I thought you were rude			
-[Bruce] : I am rude			
-[Bruce] : I'm whatever this city needs me to be			
-[Barbara] : cripes			
-[Bruce] : Because I'm BATMAN			
-Bruce>> 			
+[Barbara] : >:-(	[Bruce] : Whoa, that's insensitive		Barbara>>
+[Bruce] : Whoa, that's insensitive	[Clark] : Ummm, sorry?
+[Clark] : Ummm, sorry?	Clark>>
+-- Clark DEPARTED --
+[Barbara] : And I thought you were rude
+[Bruce] : I am rude
+[Bruce] : I'm whatever this city needs me to be
+[Barbara] : cripes
+[Bruce] : Because I'm BATMAN
+Bruce>>
 EOF
 
 
@@ -708,7 +708,7 @@ EOF
 read -r -d '' expect_outs[$T] <<"EOF"
 -- Clark JOINED --
 !!! server is shutting down !!!
-Clark>> 
+Clark>>
 EOF
 
 # Shutdown message from server
@@ -731,9 +731,9 @@ EOF
 read -r -d '' expect_outs[$T] <<"EOF"
 -- Clark JOINED --	-- Bruce JOINED --	-- Lois JOINED --
 -- Bruce JOINED --	-- Lois JOINED --	!!! server is shutting down !!!
--- Lois JOINED --	!!! server is shutting down !!!	Lois>> 
-!!! server is shutting down !!!	Bruce>> 	
-Clark>> 		
+-- Lois JOINED --	!!! server is shutting down !!!	Lois>>
+!!! server is shutting down !!!	Bruce>>
+Clark>>
 EOF
 
 
@@ -760,10 +760,10 @@ read -r -d '' expect_outs[$T] <<"EOF"
 -- Clark JOINED --	-- Bruce JOINED --	-- Lois JOINED --
 -- Bruce JOINED --	[Bruce] : Batman!	[Clark] : Superman!
 [Bruce] : Batman!	-- Lois JOINED --	!!! server is shutting down !!!
--- Lois JOINED --	[Clark] : Superman!	Lois>> 
-[Clark] : Superman!	!!! server is shutting down !!!	
-!!! server is shutting down !!!	Bruce>> 	
-Clark>> 		
+-- Lois JOINED --	[Clark] : Superman!	Lois>>
+[Clark] : Superman!	!!! server is shutting down !!!
+!!! server is shutting down !!!	Bruce>>
+Clark>>
 EOF
 
 # Many clients messages
@@ -844,14 +844,14 @@ read -r -d '' expect_outs[$T] <<"EOF"
 [F] : 14	[G] : 15			[E] : 21	-- B DEPARTED --		-- E DEPARTED --
 [G] : 15	[D] : 16			[A] : 22	[F] : 24		-- F DEPARTED --
 [D] : 16	[E] : 17			-- G DEPARTED --	-- E DEPARTED --		[H] : 25
-[E] : 17	[B] : 18			[B] : 23	F>> 		H>> 
-[B] : 18	-- D DEPARTED --			-- A DEPARTED --			
--- D DEPARTED --	[F] : 19			-- B DEPARTED --			
-[F] : 19	[F] : 20			[F] : 24			
-[F] : 20	[E] : 21			E>> 			
-[E] : 21	[A] : 22						
-[A] : 22	-- G DEPARTED --						
--- G DEPARTED --	[B] : 23						
-[B] : 23	-- A DEPARTED --						
-A>> 	B>> 						
+[E] : 17	[B] : 18			[B] : 23	F>> 		H>>
+[B] : 18	-- D DEPARTED --			-- A DEPARTED --
+-- D DEPARTED --	[F] : 19			-- B DEPARTED --
+[F] : 19	[F] : 20			[F] : 24
+[F] : 20	[E] : 21			E>>
+[E] : 21	[A] : 22
+[A] : 22	-- G DEPARTED --
+-- G DEPARTED --	[B] : 23
+[B] : 23	-- A DEPARTED --
+A>> 	B>>
 EOF
