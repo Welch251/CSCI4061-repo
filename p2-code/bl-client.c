@@ -27,20 +27,20 @@ void *user_feed(void *arg){
   while(!simpio->end_of_input) {
     //Critical
     simpio_reset(simpio);
-    iprintf(simpio, "");                                          // print prompt
-    while(!simpio->line_ready && !simpio->end_of_input){          // read until line is complete
+    iprintf(simpio, "");                         // print prompt
+    while(!simpio->line_ready && !simpio->end_of_input){
       simpio_get_char(simpio);
     }
     if(simpio->line_ready){
-      mesg_t mesg;
-      mesg_t *mesg_to_server = &mesg;
-      snprintf(mesg_to_server->body, MAXLINE, "%s", simpio->buf);
-      mesg_to_server->kind = BL_MESG;
-      write(ts_fd, mesg_to_server, sizeof(mesg_t));
+      snprintf(mesg_to_s->body, MAXLINE, "%s", simpio->buf);
+      mesg_to_s->kind = BL_MESG;
+      write(ts_fd, mesg_to_s, sizeof(mesg_t));
     }
     //Region
   }
-
+  mesg_to_s->kind = BL_DEPARTED;
+  write(ts_fd, mesg_to_s, sizeof(mesg_t));
+  close(ts_fd);
   pthread_cancel(server_thread); // kill the background thread
   return NULL;
 }
@@ -50,7 +50,7 @@ void *server_feed(void *arg){
   char * user_fname_tc = (char *)arg;
   int tc_fd = open(user_fname_tc, O_RDONLY);				//Open the to-client FIFO
   while (1){
-    //Critical 
+    //Critical
     mesg_t mesg;
     mesg_t *mesg_to_c = &mesg;
     read(tc_fd, mesg_to_c, sizeof(mesg_t));
@@ -62,14 +62,18 @@ void *server_feed(void *arg){
       snprintf(terminal_mesg, MAXLINE, "-- %s JOINED -- \n", mesg_to_c->name);
     }
     else if (mesg_to_c->kind == BL_DEPARTED){
+      close(tc_fd);
       snprintf(terminal_mesg, MAXLINE, "-- %s DEPARTED -- \n", mesg_to_c->name);
     }
     else if (mesg_to_c->kind == BL_SHUTDOWN){
-      snprintf(terminal_mesg, MAXLINE, "!!! sunnyvale is shutting down !!!");
+      close(tc_fd);
+      snprintf(terminal_mesg, MAXLINE, "!!! server is shutting down !!!");
+      break;
     }
     iprintf(simpio, terminal_mesg);
     //Region
   }
+  pthread_cancel(user_thread); // kill the background thread
   return NULL;
 }
 
@@ -132,7 +136,7 @@ int main(int argc, char *argv[]){
   pthread_create(&server_thread, NULL, server_feed, (void *) user_fname_tc);
   pthread_join(user_thread, NULL);
   pthread_join(server_thread, NULL);
-
+  close(serv_fd);
   simpio_reset_terminal_mode();
   printf("\n");                 // newline just to make returning to the terminal prettier
 }

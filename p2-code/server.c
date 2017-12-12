@@ -113,22 +113,20 @@ int server_join_ready(server_t *server){
   return server->join_ready;
 }
 int server_handle_join(server_t *server){
-  if(server_join_ready(server)){
-    join_t join;
-    int ret = read(server->join_fd, &join, sizeof(join_t));
-    if(ret < 0){
-      printf("read failed\n");
-      exit(0);
-    }
-    server_add_client(server, &join);
-    client_t *client = server_get_client(server, server->n_clients-1);
-    mesg_t msg;
-    mesg_t *mesg = &msg;
-    strncpy(mesg->name, client->name, MAXNAME);
-    mesg->kind = BL_JOINED;
-    server_broadcast(server, mesg);
-    server->join_ready = 0;
+  join_t join;
+  int ret = read(server->join_fd, &join, sizeof(join_t));
+  if(ret < 0){
+    printf("read failed\n");
+    exit(0);
   }
+  server_add_client(server, &join);
+  client_t *client = server_get_client(server, server->n_clients-1);
+  mesg_t msg;
+  mesg_t *mesg = &msg;
+  strncpy(mesg->name, client->name, MAXNAME);
+  mesg->kind = BL_JOINED;
+  server_broadcast(server, mesg);
+  server->join_ready = 0;
   return 0;
 }
 int server_client_ready(server_t *server, int idx){
