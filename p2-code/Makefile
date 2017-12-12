@@ -37,4 +37,4 @@ clean-tests :
 	rm -f test-*.{log,out,expect,diff,valgrindout}
 
 real-clean :
-	rm -f *.o bl-server bl-client
+	rm -f *.o *.fifo bl-server bl-client

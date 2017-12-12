@@ -16,13 +16,19 @@ int main(int argc, char *argv[]){
   server_t server;
   server_t *serv = &server;
   server_start(serv, serv_fname, DEFAULT_PERMS);
-  //signal(SIGTERM, sig_handler);
-  //signal(SIGINT, sig_handler);
+  signal(SIGTERM, sig_handler);
+  signal(SIGINT, sig_handler);
   while (!signalled){
+    printf("top\n");
     server_check_sources(serv);
-    server_handle_join(serv);
+    if(server_join_ready(serv)){
+      printf("inside\n");
+      server_handle_join(serv);
+    }
     for (int i=0; i < serv->n_clients; i++){
-      server_handle_client(serv,i);
+      if(server_client_ready(serv, i)){
+        server_handle_client(serv,i);
+      }
     }
   }
   server_shutdown(serv);

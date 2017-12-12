@@ -40,6 +40,7 @@ void *user_feed(void *arg){
   }
   mesg_to_s->kind = BL_DEPARTED;
   write(ts_fd, mesg_to_s, sizeof(mesg_t));
+  close(ts_fd);
   pthread_cancel(server_thread); // kill the background thread
   return NULL;
 }
@@ -61,10 +62,13 @@ void *server_feed(void *arg){
       snprintf(terminal_mesg, MAXLINE, "-- %s JOINED -- \n", mesg_to_c->name);
     }
     else if (mesg_to_c->kind == BL_DEPARTED){
+      close(tc_fd);
       snprintf(terminal_mesg, MAXLINE, "-- %s DEPARTED -- \n", mesg_to_c->name);
     }
     else if (mesg_to_c->kind == BL_SHUTDOWN){
-      snprintf(terminal_mesg, MAXLINE, "!!! sunnyvale is shutting down !!!");
+      close(tc_fd);
+      snprintf(terminal_mesg, MAXLINE, "!!! server is shutting down !!!");
+      break;
     }
     iprintf(simpio, terminal_mesg);
     //Region
@@ -132,7 +136,7 @@ int main(int argc, char *argv[]){
   pthread_create(&server_thread, NULL, server_feed, (void *) user_fname_tc);
   pthread_join(user_thread, NULL);
   pthread_join(server_thread, NULL);
-
+  close(serv_fd);
   simpio_reset_terminal_mode();
   printf("\n");                 // newline just to make returning to the terminal prettier
 }
