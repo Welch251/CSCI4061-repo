@@ -27,17 +27,15 @@ void *user_feed(void *arg){
   while(!simpio->end_of_input) {
     //Critical
     simpio_reset(simpio);
-    iprintf(simpio, "");                                          // print prompt
-    while(!simpio->line_ready && !simpio->end_of_input){          // read until line is complete
-      simpio_get_char(simpio);
-    }
+    iprintf(simpio, "");                         // print prompt
+    simpio_get_char(simpio);
     if(simpio->line_ready){
-      mesg_t mesg;
-      mesg_t *mesg_to_server = &mesg;
-      snprintf(mesg_to_server->body, MAXLINE, "%s", simpio->buf);
-      mesg_to_server->kind = BL_MESG;
-      write(ts_fd, mesg_to_server, sizeof(mesg_t));
+      snprintf(mesg_to_s->body, MAXLINE, "%s", simpio->buf);
+      mesg_to_s->kind = BL_MESG;
+      write(ts_fd, mesg_to_s, sizeof(mesg_t));
     }
+    mesg_to_s->kind = BL_DEPARTED;
+    write(ts_fd, mesg_to_s, sizeof(mesg_t));
     //Region
   }
 
@@ -50,7 +48,7 @@ void *server_feed(void *arg){
   char * user_fname_tc = (char *)arg;
   int tc_fd = open(user_fname_tc, O_RDONLY);				//Open the to-client FIFO
   while (1){
-    //Critical 
+    //Critical
     mesg_t mesg;
     mesg_t *mesg_to_c = &mesg;
     read(tc_fd, mesg_to_c, sizeof(mesg_t));
@@ -70,6 +68,7 @@ void *server_feed(void *arg){
     iprintf(simpio, terminal_mesg);
     //Region
   }
+  pthread_cancel(user_thread); // kill the background thread
   return NULL;
 }
 

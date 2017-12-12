@@ -99,6 +99,7 @@ void server_check_sources(server_t *server){
   } else{
       // At least one file descriptor has data ready
       if(FD_ISSET(server->join_fd, &fds)){
+        printf("test");
         server->join_ready = 1;
       }
       for(int i = 0; i < server->n_clients; i++){
