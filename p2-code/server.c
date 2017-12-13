@@ -11,7 +11,7 @@ void server_start(server_t *server, char *server_name, int perms){
     printf("fifo can't be made\n");
     exit(0);
   }
-  server->join_fd = open(server->server_name, perms);
+  server->join_fd = open(server->server_name, O_RDONLY);
   if(server->join_fd < 0){
     printf("join fifo can't be opened");
     exit(0);
@@ -103,9 +103,9 @@ void server_check_sources(server_t *server){
     }
   }
   max_fd++;
-  //dbg_printf("running select\n");
+  dbg_printf("running select\n");
   int ret = select(max_fd, &fds, NULL, NULL, NULL);
-  //dbg_printf("select finished %d\n", ret);
+  dbg_printf("select finished %d\n", ret);
   if(ret < 0){
     printf("the select for server_check_sources failed\n");
     exit(0);
@@ -149,6 +149,7 @@ int server_client_ready(server_t *server, int idx){
   return client->data_ready;
 }
 int server_handle_client(server_t *server, int idx){
+  dbg_printf("handling client %d\n", idx);
   mesg_t msg;
   mesg_t *mesg = &msg;
   client_t *client = server_get_client(server, idx);
@@ -159,6 +160,7 @@ int server_handle_client(server_t *server, int idx){
   }
   if(mesg->kind == BL_MESG){
     server_broadcast(server, mesg);
+    client->data_ready = 0;
   } else if(mesg->kind == BL_DEPARTED) {
       server_remove_client(server, idx);
       server_broadcast(server, mesg);
