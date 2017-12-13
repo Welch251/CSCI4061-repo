@@ -87,13 +87,19 @@ void server_check_sources(server_t *server){
   printf("Partial melt");
   fd_set fds;
   FD_ZERO(&fds);
+  int max_fd = server->join_fd;
   for(int i = 0; i < server->n_clients; i++){
     client_t *client = server_get_client(server, i);
     FD_SET(client->to_server_fd, &fds);
+    if(client->to_server_fd > max_fd){
+      max_fd = client->to_server_fd;
+    }
   }
   FD_SET(server->join_fd, &fds);
-  int n = server->join_fd+1;
-  int ret = select(n, &fds, NULL, NULL, NULL);
+  max_fd++;
+  dbg_printf("running select\n");
+  int ret = select(max_fd, &fds, NULL, NULL, NULL);
+  dbg_printf("select finished %d\n", ret);
   if(ret < 0){
     printf("the select for server_check_sources failed\n");
     exit(0);
@@ -105,6 +111,7 @@ void server_check_sources(server_t *server){
       for(int i = 0; i < server->n_clients; i++){
         client_t *client = server_get_client(server, i);
         if(FD_ISSET(client->to_server_fd, &fds)){
+          dbg_printf("client %d has data\n", i);
           client->data_ready = 1;
         }
       }
