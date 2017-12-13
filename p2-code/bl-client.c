@@ -56,7 +56,7 @@ void *server_feed(void *arg){
     read(tc_fd, mesg_to_c, sizeof(mesg_t));
     char terminal_mesg[MAXLINE];
     if (mesg_to_c->kind == BL_MESG){
-      snprintf(terminal_mesg, MAXLINE, "[%s]: %s", mesg_to_c->name, mesg_to_c->body);
+      snprintf(terminal_mesg, MAXLINE, "[%s]: %s \n", mesg_to_c->name, mesg_to_c->body);
     }
     else if (mesg_to_c->kind == BL_JOINED){
       snprintf(terminal_mesg, MAXLINE, "-- %s JOINED -- \n", mesg_to_c->name);
