@@ -84,6 +84,7 @@ int server_broadcast(server_t *server, mesg_t *mesg){
   return 0;
 }
 void server_check_sources(server_t *server){
+  printf("Partial melt");
   fd_set fds;
   FD_ZERO(&fds);
   for(int i = 0; i < server->n_clients; i++){
