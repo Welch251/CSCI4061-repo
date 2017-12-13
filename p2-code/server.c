@@ -118,7 +118,7 @@ void server_check_sources(server_t *server){
       for(int i = 0; i < server->n_clients; i++){
         client_t *client = server_get_client(server, i);
         if(FD_ISSET(client->to_server_fd, &fds)){
-          //dbg_printf("client %d has data\n", i);
+          dbg_printf("client %d has data\n", i);
           client->data_ready = 1;
         }
       }
