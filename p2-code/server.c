@@ -93,17 +93,14 @@ void server_check_sources(server_t *server){
   dbg_printf("top\n");
   fd_set fds;
   FD_ZERO(&fds);
-  int max_fd = -1;
+  int max_fd = server->join_fd;
+  FD_SET(server->join_fd, &fds);
   for(int i = 0; i < server->n_clients; i++){
     client_t *client = server_get_client(server, i);
     FD_SET(client->to_server_fd, &fds);
     if(client->to_server_fd > max_fd){
       max_fd = client->to_server_fd;
     }
-  }
-  FD_SET(server->join_fd, &fds);
-  if(server->join_fd > max_fd){
-    max_fd = server->join_fd;
   }
   max_fd++;
   dbg_printf("running select\n");
