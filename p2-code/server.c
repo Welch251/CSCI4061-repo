@@ -37,6 +37,7 @@ void server_shutdown(server_t *server){
   }
 }
 int server_add_client(server_t *server, join_t *join){
+  dbg_printf("creating client\n");
   client_t client_actual;
   client_t *client = &client_actual;
   snprintf(client->name, MAXPATH-1, "%s", join->name);
@@ -61,6 +62,7 @@ int server_add_client(server_t *server, join_t *join){
   return 0;
 }
 int server_remove_client(server_t *server, int idx){
+  dbg_printf("removing client %d\n", idx);
   client_t *client = server_get_client(server, idx);
   close(client->to_client_fd);
   close(client->to_server_fd);
@@ -75,6 +77,7 @@ int server_remove_client(server_t *server, int idx){
 int server_broadcast(server_t *server, mesg_t *mesg){
   for(int i = 0; i < server->n_clients; i++){
     client_t *client = server_get_client(server, i);
+    dbg_printf("broadcasting for client %d\n", i);
     int ret = write(client->to_client_fd, mesg, sizeof(mesg_t));
     if(ret < 0){
       printf("write failed\n");
@@ -84,7 +87,7 @@ int server_broadcast(server_t *server, mesg_t *mesg){
   return 0;
 }
 void server_check_sources(server_t *server){
-  printf("Partial melt");
+  dbg_printf("top\n");
   fd_set fds;
   FD_ZERO(&fds);
   int max_fd = server->join_fd;
@@ -142,19 +145,20 @@ int server_client_ready(server_t *server, int idx){
   return client->data_ready;
 }
 int server_handle_client(server_t *server, int idx){
-  if(server_client_ready(server, idx)){
-    mesg_t msg;
-    mesg_t *mesg = &msg;
-    client_t *client = server_get_client(server, idx);
-    int ret = read(client->to_server_fd, mesg, sizeof(mesg_t));
-    if(ret < 0){
-      printf("read failed\n");
-      exit(0);
-    }
-    if(mesg->kind == BL_MESG || mesg->kind == BL_DEPARTED){
-      server_broadcast(server, mesg);
-    }
+  mesg_t msg;
+  mesg_t *mesg = &msg;
+  client_t *client = server_get_client(server, idx);
+  int ret = read(client->to_server_fd, mesg, sizeof(mesg_t));
+  if(ret < 0){
+    printf("read failed\n");
+    exit(0);
   }
+  if(mesg->kind == BL_MESG){
+    server_broadcast(server, mesg);
+  } else if(mesg->kind == BL_DEPARTED) {
+      server_broadcast(server, mesg);
+      server_remove_client(server, idx);
+    }
   return 0;
 }
 void server_tick(server_t *server){

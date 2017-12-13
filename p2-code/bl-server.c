@@ -19,10 +19,8 @@ int main(int argc, char *argv[]){
   signal(SIGTERM, sig_handler);
   signal(SIGINT, sig_handler);
   while (!signalled){
-    printf("top\n");
     server_check_sources(serv);
     if(server_join_ready(serv)){
-      printf("inside\n");
       server_handle_join(serv);
     }
     for (int i=0; i < serv->n_clients; i++){

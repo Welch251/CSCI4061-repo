@@ -47,7 +47,7 @@ void *user_feed(void *arg){
 
 // Worker thread to listen to the info from the server.
 void *server_feed(void *arg){
-  char * user_fname_tc = (char *)arg;
+  char *user_fname_tc = (char *)arg;
   int tc_fd = open(user_fname_tc, O_RDONLY);				//Open the to-client FIFO
   while (1){
     //Critical
