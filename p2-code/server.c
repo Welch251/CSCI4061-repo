@@ -37,9 +37,9 @@ void server_shutdown(server_t *server){
   }
 }
 int server_add_client(server_t *server, join_t *join){
-  dbg_printf("creating client\n");
-  dbg_printf("%s is joining\n", join->name);
-  dbg_printf("%s is to client filename\n", join->to_client_fname);
+  //dbg_printf("creating client\n");
+  //dbg_printf("%s is joining\n", join->name);
+  //dbg_printf("%s is to client filename\n", join->to_client_fname);
   client_t client_actual;
   client_t *client = &client_actual;
   snprintf(client->name, MAXPATH-1, "%s", join->name);
@@ -64,14 +64,14 @@ int server_add_client(server_t *server, join_t *join){
   return 0;
 }
 int server_remove_client(server_t *server, int idx){
-  dbg_printf("removing client %d\n", idx);
+  //dbg_printf("removing client %d\n", idx);
   client_t *client = server_get_client(server, idx);
   close(client->to_client_fd);
   close(client->to_server_fd);
   remove(client->to_client_fname);
   remove(client->to_server_fname);
   for(int i = idx+1; i < server->n_clients; i++){
-    dbg_printf("shifting client %d\n", i);
+    //dbg_printf("shifting client %d\n", i);
     server->client[i-1] = *server_get_client(server, i);
   }
   server->n_clients--;
@@ -80,7 +80,7 @@ int server_remove_client(server_t *server, int idx){
 int server_broadcast(server_t *server, mesg_t *mesg){
   for(int i = 0; i < server->n_clients; i++){
     client_t *client = server_get_client(server, i);
-    dbg_printf("broadcasting for client %d\n", i);
+    //dbg_printf("broadcasting for client %d\n", i);
     int ret = write(client->to_client_fd, mesg, sizeof(mesg_t));
     if(ret < 0){
       printf("write failed\n");
@@ -90,7 +90,7 @@ int server_broadcast(server_t *server, mesg_t *mesg){
   return 0;
 }
 void server_check_sources(server_t *server){
-  dbg_printf("top\n");
+  //dbg_printf("top\n");
   fd_set fds;
   FD_ZERO(&fds);
   int max_fd = server->join_fd;
@@ -103,22 +103,22 @@ void server_check_sources(server_t *server){
     }
   }
   max_fd++;
-  dbg_printf("running select\n");
+  //dbg_printf("running select\n");
   int ret = select(max_fd, &fds, NULL, NULL, NULL);
-  dbg_printf("select finished %d\n", ret);
+  //dbg_printf("select finished %d\n", ret);
   if(ret < 0){
     printf("the select for server_check_sources failed\n");
     exit(0);
   } else{
       // At least one file descriptor has data ready
       if(FD_ISSET(server->join_fd, &fds)){
-        dbg_printf("join ready\n");
+        //dbg_printf("join ready\n");
         server->join_ready = 1;
       }
       for(int i = 0; i < server->n_clients; i++){
         client_t *client = server_get_client(server, i);
         if(FD_ISSET(client->to_server_fd, &fds)){
-          dbg_printf("client %d has data\n", i);
+          //dbg_printf("client %d has data\n", i);
           client->data_ready = 1;
         }
       }

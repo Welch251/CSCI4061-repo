@@ -38,11 +38,10 @@ void *user_feed(void *arg){
     }
     //Region
   }
-  dbg_printf("departing\n");
+  pthread_cancel(server_thread); // kill the background thread
   mesg_to_s->kind = BL_DEPARTED;
   write(ts_fd, mesg_to_s, sizeof(mesg_t));
   close(ts_fd);
-  pthread_cancel(server_thread); // kill the background thread
   return NULL;
 }
 
