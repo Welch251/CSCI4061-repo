@@ -38,6 +38,8 @@ void server_shutdown(server_t *server){
 }
 int server_add_client(server_t *server, join_t *join){
   dbg_printf("creating client\n");
+  dbg_printf("%s is joining\n", join->name);
+  dbg_printf("%s is to client filename\n", join->to_client_fname);
   client_t client_actual;
   client_t *client = &client_actual;
   snprintf(client->name, MAXPATH-1, "%s", join->name);
@@ -69,6 +71,7 @@ int server_remove_client(server_t *server, int idx){
   remove(client->to_client_fname);
   remove(client->to_server_fname);
   for(int i = idx+1; i < server->n_clients; i++){
+    dbg_printf("shifting client %d\n", i);
     server->client[i-1] = *server_get_client(server, i);
   }
   server->n_clients--;
@@ -90,7 +93,7 @@ void server_check_sources(server_t *server){
   dbg_printf("top\n");
   fd_set fds;
   FD_ZERO(&fds);
-  int max_fd = server->join_fd;
+  int max_fd = -1;
   for(int i = 0; i < server->n_clients; i++){
     client_t *client = server_get_client(server, i);
     FD_SET(client->to_server_fd, &fds);
@@ -99,6 +102,9 @@ void server_check_sources(server_t *server){
     }
   }
   FD_SET(server->join_fd, &fds);
+  if(server->join_fd > max_fd){
+    max_fd = server->join_fd;
+  }
   max_fd++;
   dbg_printf("running select\n");
   int ret = select(max_fd, &fds, NULL, NULL, NULL);
@@ -109,6 +115,7 @@ void server_check_sources(server_t *server){
   } else{
       // At least one file descriptor has data ready
       if(FD_ISSET(server->join_fd, &fds)){
+        dbg_printf("join ready\n");
         server->join_ready = 1;
       }
       for(int i = 0; i < server->n_clients; i++){
@@ -156,9 +163,9 @@ int server_handle_client(server_t *server, int idx){
   if(mesg->kind == BL_MESG){
     server_broadcast(server, mesg);
   } else if(mesg->kind == BL_DEPARTED) {
-      server_broadcast(server, mesg);
       server_remove_client(server, idx);
-    }
+      server_broadcast(server, mesg);
+  }
   return 0;
 }
 void server_tick(server_t *server){

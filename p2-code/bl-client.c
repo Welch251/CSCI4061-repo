@@ -56,23 +56,22 @@ void *server_feed(void *arg){
     read(tc_fd, mesg_to_c, sizeof(mesg_t));
     char terminal_mesg[MAXLINE];
     if (mesg_to_c->kind == BL_MESG){
-      snprintf(terminal_mesg, MAXLINE, "[%s]: %s \n", mesg_to_c->name, mesg_to_c->body);
+      snprintf(terminal_mesg, MAXLINE, "[%s] : %s \n", mesg_to_c->name, mesg_to_c->body);
     }
     else if (mesg_to_c->kind == BL_JOINED){
       snprintf(terminal_mesg, MAXLINE, "-- %s JOINED -- \n", mesg_to_c->name);
     }
     else if (mesg_to_c->kind == BL_DEPARTED){
-      close(tc_fd);
       snprintf(terminal_mesg, MAXLINE, "-- %s DEPARTED -- \n", mesg_to_c->name);
     }
     else if (mesg_to_c->kind == BL_SHUTDOWN){
-      close(tc_fd);
       snprintf(terminal_mesg, MAXLINE, "!!! server is shutting down !!!");
       break;
     }
     iprintf(simpio, terminal_mesg);
     //Region
   }
+  close(tc_fd);
   pthread_cancel(user_thread); // kill the background thread
   return NULL;
 }
@@ -125,7 +124,6 @@ int main(int argc, char *argv[]){
   args.arg2 = user_name;
 
   write(serv_fd, join, sizeof(join_t));		//Write join request to server's FIFO
-
   char prompt[MAXNAME];
   snprintf(prompt, MAXNAME, "%s>> ",user_name); // create a prompt string
   simpio_set_prompt(simpio, prompt);         // set the prompt
