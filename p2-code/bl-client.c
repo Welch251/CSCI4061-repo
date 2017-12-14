@@ -1,5 +1,10 @@
 #include "blather.h"
 
+/*
+  Authors: Evan Welch & Jakob Urnes
+*/
+
+
 simpio_t simpio_actual;
 simpio_t *simpio = &simpio_actual;
 
