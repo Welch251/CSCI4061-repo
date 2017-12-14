@@ -4,7 +4,7 @@ client_t *server_get_client(server_t *server, int idx){
   return &server->client[idx];
 }
 void server_start(server_t *server, char *server_name, int perms){
-  snprintf(server->server_name, MAXPATH-1, "%s", server_name);
+  snprintf(server->server_name, MAXPATH, "%s", server_name);
   remove(server->server_name);
   int ret = mkfifo(server->server_name, perms);
   if(ret < 0){
@@ -44,9 +44,9 @@ int server_add_client(server_t *server, join_t *join){
   client_t client_actual;
   client_t *client = &client_actual;
   memset(client, 0, sizeof(client_t));
-  snprintf(client->name, MAXPATH-1, "%s", join->name);
-  snprintf(client->to_client_fname, MAXPATH-1, "%s", join->to_client_fname);
-  snprintf(client->to_server_fname, MAXPATH-1, "%s", join->to_server_fname);
+  snprintf(client->name, MAXPATH, "%s", join->name);
+  snprintf(client->to_client_fname, MAXPATH, "%s", join->to_client_fname);
+  snprintf(client->to_server_fname, MAXPATH, "%s", join->to_server_fname);
   client->to_client_fd = open(client->to_client_fname, O_WRONLY);
   if(client->to_client_fd < 0){
     //printf("to client fifo '%s' can't be opened\n",client->to_client_fname);
