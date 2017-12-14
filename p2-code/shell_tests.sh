@@ -4,7 +4,7 @@ generate=0
 run_norm=1                                 # run normal tests
 run_valg=1                                 # run valgrind tests
 
-ticktime_norm=0.25
+ticktime_norm=0.05
 ticktime_valg=0.5
 ticktime=$ticktime_valg
 

@@ -20,7 +20,7 @@ function server_close () {
 
 function client_spawn () {
   client=$1
-  echo spawning "$client"
+  # echo spawning "$client"
   client_out="${tid}-${client}.${valg}out"
   client_fifo="${tid}-${client}.fifo"
   outfiles+=("$client_out")
@@ -30,26 +30,26 @@ function client_spawn () {
     >($valg ${valg_opts} ./bl-client $server $client |& ./normalize.awk >& \
     ${client_out} ) &  pid=$!
   eval ${client}_pid=$pid
-  echo client "$client $pid" spawned
+  # echo client "$client $pid" spawned
 }
 
 function client_print () {
   client=$1
   mesg="$2"
   echo -e "$mesg" > ${tid}-${client}.fifo
-  echo -e "$mesg" ${tid}-${client}.fifo
+  # echo -e "$mesg" ${tid}-${client}.fifo
   # printf "%s\n" "$mesg" > ${client}.fifo
 }
 
 function client_close () {
   client=$1
-  echo closing "$client"
+  # echo closing "$client"
   client_pid="${client}_pid"
-  echo "$client_pid" ${!client_pid}
+  # echo "$client_pid" ${!client_pid}
   kill "${!client_pid}"
   wait "${!client_pid}"
   rm -f ${tid}-${client}.fifo
-  echo client "$client" closed
+  # echo client "$client" closed
 }
 
 

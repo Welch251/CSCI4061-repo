@@ -3,6 +3,7 @@
 int signalled = 0;
 
 void sig_handler(int signo) {
+  dbg_printf("handling signal\n");
   signalled = 1;
 }
 
@@ -29,6 +30,7 @@ int main(int argc, char *argv[]){
       }
     }
   }
+  dbg_printf("safe shutdown\n");
   server_shutdown(serv);
   return 0;
 }
