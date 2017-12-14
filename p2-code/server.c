@@ -24,6 +24,7 @@ void server_shutdown(server_t *server){
   remove(server->server_name);
   mesg_t msg;
   mesg_t *mesg = &msg;
+  memset(mesg, 0, sizeof(mesg_t));
   mesg->kind = BL_SHUTDOWN;
   while(server->n_clients > 0){
     client_t *client = server_get_client(server, server->n_clients-1);
@@ -42,6 +43,7 @@ int server_add_client(server_t *server, join_t *join){
   //dbg_printf("%s is to client filename\n", join->to_client_fname);
   client_t client_actual;
   client_t *client = &client_actual;
+  memset(client, 0, sizeof(client_t));
   snprintf(client->name, MAXPATH-1, "%s", join->name);
   snprintf(client->to_client_fname, MAXPATH-1, "%s", join->to_client_fname);
   snprintf(client->to_server_fname, MAXPATH-1, "%s", join->to_server_fname);
@@ -138,6 +140,7 @@ int server_handle_join(server_t *server){
   client_t *client = server_get_client(server, server->n_clients-1);
   mesg_t msg;
   mesg_t *mesg = &msg;
+  memset(mesg, 0, sizeof(mesg_t));
   strncpy(mesg->name, client->name, MAXNAME);
   mesg->kind = BL_JOINED;
   server_broadcast(server, mesg);
@@ -152,6 +155,7 @@ int server_handle_client(server_t *server, int idx){
   dbg_printf("handling client %d\n", idx);
   mesg_t msg;
   mesg_t *mesg = &msg;
+  memset(mesg, 0, sizeof(mesg_t));
   client_t *client = server_get_client(server, idx);
   int ret = read(client->to_server_fd, mesg, sizeof(mesg_t));
   if(ret < 0){

@@ -16,6 +16,7 @@ int main(int argc, char *argv[]){
   char * serv_fname = argv[1];
   server_t server;
   server_t *serv = &server;
+  memset(serv, 0, sizeof(server_t));
   server_start(serv, serv_fname, DEFAULT_PERMS);
   signal(SIGTERM, sig_handler);
   signal(SIGINT, sig_handler);

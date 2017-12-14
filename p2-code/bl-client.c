@@ -23,6 +23,7 @@ void *user_feed(void *arg){
   char * user_name = args->arg2;
   mesg_t msg;
   mesg_t *mesg_to_s = &msg;
+  memset(mesg_to_s, 0, sizeof(mesg_t));
   snprintf(mesg_to_s->name, MAXNAME, "%s", user_name);
   while(!simpio->end_of_input) {
     //Critical
@@ -53,6 +54,7 @@ void *server_feed(void *arg){
     //Critical
     mesg_t mesg;
     mesg_t *mesg_to_c = &mesg;
+    memset(mesg_to_c, 0, sizeof(mesg_t));
     read(tc_fd, mesg_to_c, sizeof(mesg_t));
     char terminal_mesg[MAXLINE];
     if (mesg_to_c->kind == BL_MESG){
@@ -102,9 +104,10 @@ int main(int argc, char *argv[]){
   strcpy(user_fname_tc,"");			//Add name info to char arrays
   strcpy(user_fname_ts,"");
   strcat(user_fname_tc,user_name);
-  strcat(user_fname_tc,"_to_cl");
+  strcat(user_fname_tc,"_to_cl \0");
   strcat(user_fname_ts,user_name);
-  strcat(user_fname_ts,"_to_srv");
+  strcat(user_fname_ts,"_to_srv \0");
+  strcat(user_name,"\0");
 
   mkfifo(user_fname_tc, S_IRUSR | S_IWUSR);	//Make to-client FIFO
   mkfifo(user_fname_ts, S_IRUSR | S_IWUSR);     //Make to-server FIFO
@@ -113,16 +116,18 @@ int main(int argc, char *argv[]){
   join_t join_actual;
   join_t *join = &join_actual;					//Create join request struct
 
+  memset(join, 0, sizeof(join_t));
+
   snprintf(join->name, MAXPATH, "%s", user_name); //Send user name info to join struct
   snprintf(join->to_client_fname, MAXPATH, "%s", user_fname_tc); //Send to-client name info to join struct
   snprintf(join->to_server_fname, MAXPATH, "%s", user_fname_ts); //Send to-server name info to join struct
 
   serv_fd = open(serv_fname, O_RDWR); 		//Open the server's FIFO
 
-
   struct arg_struct args;
   args.arg1 = user_fname_ts;
   args.arg2 = user_name;
+
 
   write(serv_fd, join, sizeof(join_t));		//Write join request to server's FIFO
   char prompt[MAXNAME];
