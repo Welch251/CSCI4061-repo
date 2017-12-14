@@ -1,4 +1,5 @@
 #include "blather.h"
+#include <errno.h>
 
 client_t *server_get_client(server_t *server, int idx){
   return &server->client[idx];
@@ -108,10 +109,10 @@ void server_check_sources(server_t *server){
   dbg_printf("running select\n");
   int ret = select(max_fd, &fds, NULL, NULL, NULL);
   dbg_printf("select finished %d\n", ret);
-  if(ret < 0){
-    printf("the select for server_check_sources failed\n");
-    //exit(0);
+  if(errno == EINTR){
+    printf("the select for server_check_sources received a signal and exited\n");
   } else{
+      check_fail(ret == -1, 1, "select call failed\n");
       // At least one file descriptor has data ready
       if(FD_ISSET(server->join_fd, &fds)){
         dbg_printf("join ready\n");
