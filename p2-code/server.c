@@ -1,28 +1,32 @@
 #include "blather.h"
 #include <errno.h>
 
+/*
+  Authors: Evan Welch & Jakob Urnes
+*/
+
 client_t *server_get_client(server_t *server, int idx){
   return &server->client[idx];
 }
 void server_start(server_t *server, char *server_name, int perms){
-  snprintf(server->server_name, MAXPATH, "%s", server_name);
-  remove(server->server_name);
-  int ret = mkfifo(server->server_name, perms);
-  if(ret < 0){
-    printf("fifo can't be made\n");
-    exit(0);
+  int ret = snprintf(server->server_name, MAXPATH, "%s", server_name);
+  check_fail(ret < 0, 1, "server_name initialization failed\n");
+  int rm = remove(server->server_name);
+  if(rm < 0){
+    fprintf(stderr, "can't remove server name file\n");
   }
+  int ret2 = mkfifo(server->server_name, perms);
+  check_fail(ret2 < 0, 1, "fifo can't be made\n");
   server->join_fd = open(server->server_name, O_RDWR);
-  if(server->join_fd < 0){
-    printf("join fifo can't be opened");
-    exit(0);
-  }
+  check_fail(server->join_fd < 0, 1, "join fifo can't be opened\n");
   server->join_ready = 0;
   server->n_clients = 0;
 }
 void server_shutdown(server_t *server){
-  close(server->join_fd);
-  remove(server->server_name);
+  int cl = close(server->join_fd);
+  check_fail(cl < 0, 1, "join fifo can't be closed\n");
+  int rm = remove(server->server_name);
+  check_fail(rm < 0, 1, "server name file can't be removed\n");
   mesg_t msg;
   mesg_t *mesg = &msg;
   memset(mesg, 0, sizeof(mesg_t));
@@ -30,34 +34,25 @@ void server_shutdown(server_t *server){
   while(server->n_clients > 0){
     client_t *client = server_get_client(server, server->n_clients-1);
     int ret = write(client->to_client_fd, mesg, sizeof(mesg_t));
-    if(ret < 0){
-      printf("server shutdown write to client failed\n");
-      exit(0);
-    }
+    check_fail(ret < 0, 1, "server shutdown write to client failed\n");
     client = NULL;
     server->n_clients--;
   }
 }
 int server_add_client(server_t *server, join_t *join){
-  //dbg_printf("creating client\n");
-  //dbg_printf("%s is joining\n", join->name);
-  //dbg_printf("%s is to client filename\n", join->to_client_fname);
   client_t client_actual;
   client_t *client = &client_actual;
   memset(client, 0, sizeof(client_t));
-  snprintf(client->name, MAXPATH, "%s", join->name);
-  snprintf(client->to_client_fname, MAXPATH, "%s", join->to_client_fname);
-  snprintf(client->to_server_fname, MAXPATH, "%s", join->to_server_fname);
+  int ret1 = snprintf(client->name, MAXPATH, "%s", join->name);
+  check_fail(ret1 < 0, 1, "client name initialization failed\n");
+  int ret2 = snprintf(client->to_client_fname, MAXPATH, "%s", join->to_client_fname);
+  check_fail(ret2 < 0, 1, "to_client_fname initialization failed\n");
+  int ret3 = snprintf(client->to_server_fname, MAXPATH, "%s", join->to_server_fname);
+  check_fail(ret3 < 0, 1, "to_server_fname initialization failed\n");
   client->to_client_fd = open(client->to_client_fname, O_WRONLY);
-  if(client->to_client_fd < 0){
-    //printf("to client fifo '%s' can't be opened\n",client->to_client_fname);
-    exit(0);
-  }
+  check_fail(client->to_client_fd < 0, 1, "to client fifo can't be opened\n");
   client->to_server_fd = open(client->to_server_fname, O_RDONLY);
-  if(client->to_server_fd < 0){
-    printf("to server fifo can't be opened\n");
-    exit(0);
-  }
+  check_fail(client->to_server_fd < 0, 1, "to server fifo can't be opened\n");
   client->data_ready = 0;
   if(server->n_clients == MAXCLIENTS){
     return 1;
@@ -67,14 +62,16 @@ int server_add_client(server_t *server, join_t *join){
   return 0;
 }
 int server_remove_client(server_t *server, int idx){
-  //dbg_printf("removing client %d\n", idx);
   client_t *client = server_get_client(server, idx);
-  close(client->to_client_fd);
-  close(client->to_server_fd);
-  remove(client->to_client_fname);
-  remove(client->to_server_fname);
+  int cl1 = close(client->to_client_fd);
+  check_fail(cl1 < 0, 1, "to client fifo can't be closed\n");
+  int cl2 = close(client->to_server_fd);
+  check_fail(cl2 < 0, 1, "to server fifo can't be closed\n");
+  int rm1 = remove(client->to_client_fname);
+  check_fail(rm1 < 0, 1, "to client name file can't be removed\n");
+  int rm2 = remove(client->to_server_fname);
+  check_fail(rm2 < 0, 1, "to server name file can't be removed\n");
   for(int i = idx+1; i < server->n_clients; i++){
-    //dbg_printf("shifting client %d\n", i);
     server->client[i-1] = *server_get_client(server, i);
   }
   server->n_clients--;
@@ -83,17 +80,12 @@ int server_remove_client(server_t *server, int idx){
 int server_broadcast(server_t *server, mesg_t *mesg){
   for(int i = 0; i < server->n_clients; i++){
     client_t *client = server_get_client(server, i);
-    //dbg_printf("broadcasting for client %d\n", i);
     int ret = write(client->to_client_fd, mesg, sizeof(mesg_t));
-    if(ret < 0){
-      printf("write failed\n");
-      exit(0);
-    }
+    check_fail(ret < 0, 1, "write to client %d failed\n", i);
   }
   return 0;
 }
 void server_check_sources(server_t *server){
-  //dbg_printf("top\n");
   fd_set fds;
   FD_ZERO(&fds);
   int max_fd = server->join_fd;
@@ -106,23 +98,19 @@ void server_check_sources(server_t *server){
     }
   }
   max_fd++;
-  dbg_printf("running select\n");
   int ret = select(max_fd, &fds, NULL, NULL, NULL);
-  dbg_printf("select finished %d\n", ret);
   if(errno == EINTR){
-    printf("the select for server_check_sources received a signal and exited\n");
+    fprintf(stderr, "the select for server_check_sources received a signal and exited\n");
     return;
   } else{
-      check_fail(ret == -1, 1, "select call failed\n");
+      check_fail(ret < 0, 1, "select call failed\n");
       // At least one file descriptor has data ready
       if(FD_ISSET(server->join_fd, &fds)){
-        dbg_printf("join ready\n");
         server->join_ready = 1;
       }
       for(int i = 0; i < server->n_clients; i++){
         client_t *client = server_get_client(server, i);
         if(FD_ISSET(client->to_server_fd, &fds)){
-          dbg_printf("client %d has data\n", i);
           client->data_ready = 1;
         }
       }
@@ -134,16 +122,14 @@ int server_join_ready(server_t *server){
 int server_handle_join(server_t *server){
   join_t join;
   int ret = read(server->join_fd, &join, sizeof(join_t));
-  if(ret < 0){
-    printf("read failed\n");
-    exit(0);
-  }
+  check_fail(ret < 0, 1, "read for join fifo failed\n");
   server_add_client(server, &join);
   client_t *client = server_get_client(server, server->n_clients-1);
   mesg_t msg;
   mesg_t *mesg = &msg;
   memset(mesg, 0, sizeof(mesg_t));
-  strncpy(mesg->name, client->name, MAXNAME);
+  int ret2 = snprintf(mesg->name, MAXNAME, "%s", client->name);
+  check_fail(ret2 < 0, 1, "message name initialization failed\n");
   mesg->kind = BL_JOINED;
   server_broadcast(server, mesg);
   server->join_ready = 0;
@@ -154,16 +140,12 @@ int server_client_ready(server_t *server, int idx){
   return client->data_ready;
 }
 int server_handle_client(server_t *server, int idx){
-  dbg_printf("handling client %d\n", idx);
   mesg_t msg;
   mesg_t *mesg = &msg;
   memset(mesg, 0, sizeof(mesg_t));
   client_t *client = server_get_client(server, idx);
   int ret = read(client->to_server_fd, mesg, sizeof(mesg_t));
-  if(ret < 0){
-    printf("read failed\n");
-    exit(0);
-  }
+  check_fail(ret < 0, 1, "read for to server fifo failed\n");
   if(mesg->kind == BL_MESG){
     server_broadcast(server, mesg);
     client->data_ready = 0;
@@ -172,19 +154,4 @@ int server_handle_client(server_t *server, int idx){
       server_broadcast(server, mesg);
   }
   return 0;
-}
-void server_tick(server_t *server){
-
-}
-void server_ping_clients(server_t *server){
-
-}
-void server_remove_disconnected(server_t *server, int disconnect_secs){
-
-}
-void server_write_who(server_t *server){
-
-}
-void server_log_message(server_t *server, mesg_t *mesg){
-
 }
