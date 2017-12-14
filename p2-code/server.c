@@ -111,6 +111,7 @@ void server_check_sources(server_t *server){
   dbg_printf("select finished %d\n", ret);
   if(errno == EINTR){
     printf("the select for server_check_sources received a signal and exited\n");
+    return;
   } else{
       check_fail(ret == -1, 1, "select call failed\n");
       // At least one file descriptor has data ready
