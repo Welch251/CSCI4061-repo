@@ -11,7 +11,7 @@ void server_start(server_t *server, char *server_name, int perms){
     printf("fifo can't be made\n");
     exit(0);
   }
-  server->join_fd = open(server->server_name, O_RDONLY);
+  server->join_fd = open(server->server_name, O_RDWR);
   if(server->join_fd < 0){
     printf("join fifo can't be opened");
     exit(0);
@@ -47,7 +47,7 @@ int server_add_client(server_t *server, join_t *join){
   snprintf(client->to_server_fname, MAXPATH-1, "%s", join->to_server_fname);
   client->to_client_fd = open(client->to_client_fname, O_WRONLY);
   if(client->to_client_fd < 0){
-    printf("to client fifo can't be opened\n");
+    //printf("to client fifo '%s' can't be opened\n",client->to_client_fname);
     exit(0);
   }
   client->to_server_fd = open(client->to_server_fname, O_RDONLY);
@@ -108,11 +108,11 @@ void server_check_sources(server_t *server){
   dbg_printf("select finished %d\n", ret);
   if(ret < 0){
     printf("the select for server_check_sources failed\n");
-    exit(0);
+    //exit(0);
   } else{
       // At least one file descriptor has data ready
       if(FD_ISSET(server->join_fd, &fds)){
-        //dbg_printf("join ready\n");
+        dbg_printf("join ready\n");
         server->join_ready = 1;
       }
       for(int i = 0; i < server->n_clients; i++){

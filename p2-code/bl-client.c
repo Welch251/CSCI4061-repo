@@ -65,7 +65,8 @@ void *server_feed(void *arg){
       snprintf(terminal_mesg, MAXLINE, "-- %s DEPARTED -- \n", mesg_to_c->name);
     }
     else if (mesg_to_c->kind == BL_SHUTDOWN){
-      snprintf(terminal_mesg, MAXLINE, "!!! server is shutting down !!!");
+      snprintf(terminal_mesg, MAXLINE, "!!! server is shutting down !!!\n");
+      iprintf(simpio, terminal_mesg);
       break;
     }
     iprintf(simpio, terminal_mesg);
