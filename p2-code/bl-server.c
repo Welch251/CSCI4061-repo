@@ -1,5 +1,9 @@
 #include "blather.h"
 
+/*
+  Authors: Evan Welch & Jakob Urnes
+*/
+
 int signalled = 0;
 
 void sig_handler(int signo) {
